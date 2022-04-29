@@ -38,7 +38,7 @@ public class RFID implements Runnable{
 		// 리더기가 연결되어 있는지
 		System.out.println("RFID READER DEVICE : " + r.ccr_device_find());
 		
-        while(true) {
+        while(r.ccr_device_find()) {
             try {
                 String readStr = Reader();
                 if(readStr != null){
@@ -144,7 +144,7 @@ public class RFID implements Runnable{
                 sb.append(chars[i]);
             }
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
-            return new String(bytes,"euc-kr");
+            return new String(bytes,"utf-8");
         } catch (Exception e) {
            System.out.println(e);
            return null;
