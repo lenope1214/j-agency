@@ -19,16 +19,13 @@ public class AppListner implements CommandLineRunner {
     String ip;
     @Value("${target}")
     String target;
+    @Value("${batUrl}")
+    String batUrl;
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("mode : {}", mode);
         if (mode != null && mode.equals("rfid")) {
-            log.info("ip : {}", ip);
-            log.info("target : {}", target);
             HashMap<String, Object> params = new HashMap<>();
-            params.put("ip", ip);
-            params.put("target", target);
             RFID rfid = new RFID(params);
             Thread thread = new Thread(rfid);
             thread.start();

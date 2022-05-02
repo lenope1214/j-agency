@@ -3,11 +3,13 @@ package knuh.rfid;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import knuh.rfid.util.ReqService;
 
+@Slf4j
 public class RFID implements Runnable{
     // private final ApplicationArguments appArgs;
     private final HashMap<String, Object> param;
@@ -45,6 +47,7 @@ public class RFID implements Runnable{
                     System.out.println(readStr);
                     this.GoodBeep();
                     ReqService send = new ReqService();
+                    log.info("rfid data : {}", readStr);
                     param.put("data", readStr);
                     send.tag(param);
                     try{
