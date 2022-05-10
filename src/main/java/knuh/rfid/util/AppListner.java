@@ -13,6 +13,7 @@ import knuh.rfid.RFID;
 @Slf4j
 public class AppListner implements CommandLineRunner {
 
+    // : 을 붙여서   java jclient --mode 이런 properties를 입력 안 했을때 오류 나지 않도록 설정해준다.
     @Value("${mode}")
     String mode;
     @Value("${ip}")
