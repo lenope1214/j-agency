@@ -79,7 +79,8 @@ public class Rest {
 
                 //파일이 존재하는 위치의 URL
 //                String fileUrl = target+"/api/v1/files/shop/11/test/plzme.txt/download";
-                String fileUrl = target+"/api/v1/files/jclient";
+                // 192.168.101.210:6060/files/download/jclient
+                String fileUrl = target+"/files/download/jclient";
 
 
                 // 특정 url을 지정했다면, 그것으로 지정한다.
