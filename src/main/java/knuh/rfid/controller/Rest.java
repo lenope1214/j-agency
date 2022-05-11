@@ -1,5 +1,8 @@
 package knuh.rfid.controller;
 
+import knuh.rfid.RFID;
+import knuh.rfid.util.CmdImpl;
+import knuh.rfid.util.CmdInterface;
 import knuh.rfid.util.ExtApi;
 import knuh.rfid.util.Storage;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @Slf4j
-public class Rest {
+public class Rest  {
 
     @Value("${mode}")
     String mode;
@@ -39,10 +43,22 @@ public class Rest {
     @Autowired
     private ExtApi extApi;
 
+    @Autowired
+    private CmdImpl cmd;
+
+//    @GetMapping("/utf")
+//    public ResponseEntity<?> utf(@RequestParam(name = "s",required = false) String s){
+//        RFID rfid = new RFID(null);
+//        String hex = "B0A1B3AAB4D9B6F3B8B6B9D9BBE7BEC6C0DAC2F7C4ABC5B8C6C4C7CFBEC6BEDFBEEEBFA9BFC0BFE4BFECC0AFC0B8C0CCC0CCBCBABAB9";
+//        if(s!=null)hex = s;
+//        String str = rfid.decodeHexToString(hex);
+//        return new ResponseEntity<>(str, HttpStatus.OK);
+//    }
+
     @GetMapping(value = "/poweroff")
     public void poweroff() {
         log.info("Shutdown!");
-        shutdown();
+        cmd.shutdown();
     }
 
 
@@ -50,7 +66,7 @@ public class Rest {
     public ResponseEntity<?> chromeReboot() {
         log.info("chrome reboot!");
         if (ip != null && batUrl != null) {
-            return new ResponseEntity<>(reboot(), HttpStatus.OK);
+            return new ResponseEntity<>(cmd.reboot(), HttpStatus.OK);
         } else {
             return new ResponseEntity("ip와 batUrl이 지정되어있지 않습니다.", HttpStatus.OK);
         }
@@ -89,10 +105,9 @@ public class Rest {
                 }
 
                 // http 프로토콜 설정이 없으면 기본으로 http 붙여줌
-                fileUrl = storage.containHttpProtocol(fileUrl);
+                fileUrl = extApi.containHttpProtocol(fileUrl);
 
 
-                log.info("url : {}", fileUrl);
                 url = new URL(fileUrl);
                 // 만약 프로토콜이 https 라면 https SSL을 무시하는 로직을 수행해주어야 한다.('https 인증서 무시' 라는 키워드로 구글에 검색하면 많이 나옵니다.)
 
@@ -112,7 +127,8 @@ public class Rest {
 
                 in.close();
                 fileOutputStream.close();
-
+                // 파일이 정상적으로 다운이 됐다면 재부팅.
+                cmd.runCmd("shutdown -r -t 0"); // 즉시 재부팅 명령어
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -121,41 +137,14 @@ public class Rest {
                 if (fileOutputStream != null) fileOutputStream.close();
             }
         } else {
-            log.info("호스트 연결 실패 호스트 : {}", target);
+            log.error("호스트 연결 실패 호스트 : {}", target);
         }
 
 
     }
 
 
-    public String shutdown() {
-        return runCmd("shutdown -s -f") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
-    }
-
-    public String reboot() {
-        if (killChrome()) return runBat() ? "success reboot" : "failed to open chrome";
-        return "failed to kill chrome";
-    }
-
-    public boolean killChrome() {
-        return runCmd("TASKKILL /F /IM chrome.exe /T");
-    }
-
-    public boolean runBat() {
-        return runCmd(this.batUrl);
-    }
 
 
-    public boolean runCmd(String command) {
-        try {
 
-            // /c = 문자열로 이루어진 명령어를 실행,
-            Process myProcess = Runtime.getRuntime().exec("cmd /c " + command);
-            myProcess.waitFor();
-
-            return myProcess.exitValue() == 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

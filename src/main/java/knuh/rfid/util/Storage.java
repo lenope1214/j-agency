@@ -32,12 +32,4 @@ public class Storage {
         return filePath;
     }
 
-    public String containHttpProtocol(String fileUrl){
-        // http 프로토콜 설정이 없으면 기본으로 http 붙여줌
-        if(!fileUrl.matches("^(https?)://")){
-            fileUrl = "http://"+fileUrl;
-        }
-        return fileUrl;
-    }
-
 }

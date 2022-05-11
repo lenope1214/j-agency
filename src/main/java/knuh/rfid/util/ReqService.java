@@ -9,14 +9,20 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ReqService {
 
+    @Autowired
+    private ExtApi extApi;
+
     public Boolean tag(HashMap<String, Object> input) {
         try{
-            URL url = new URL(input.get("target") +"/api/v2/health/tag");
+            String target = input.get("target").toString();
+            target = extApi.containHttpProtocol(target);
+            URL url = new URL( target+"/api/v2/health/tag");
             System.out.println("URL : " + url);
             String[] data = input.get("data").toString().split(" ");
             HashMap<String, Object> params = new LinkedHashMap<>();

@@ -1,5 +1,6 @@
 package knuh.rfid;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -142,12 +143,13 @@ public class RFID implements Runnable{
         try {
             StringBuilder sb = new StringBuilder();
             char[] chars = hexString.toCharArray();
-            // 문자열 32비트 자르기
-            for(int i = 4 ; i < 34 ; i++){
+            // 문자열 32비트 자르기 -> 최대 32비트로 들어감. 한글로 7글자 까지 가능
+            for(int i = 0 ; i < 32 && i<chars.length ; i++){
                 sb.append(chars[i]);
             }
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
-            return new String(bytes,"utf-8");
+            String result = new String(bytes, "euc-kr");//euc-kr로 인코딩 되어있음.
+            return result;
         } catch (Exception e) {
            System.out.println(e);
            return null;
