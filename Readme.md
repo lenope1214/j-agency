@@ -7,7 +7,8 @@
 |    Spring    |    Spring Boot 2.5.6.RELEASE   |
 |      OS      |          Windows 10             |
 |   개발 툴    | VSCODE |
-|     JDK      |             `JDK 8`             |
+|     JDK[rfid]      |             [`JDK 8 32bit`]
+|     JDK[default]      |           [`JDK 1.8↑ any bit`]             |
 |   빌드     |          gradle-7.3.2          |
 |   패키지    |          JAR          |
 ---
@@ -46,5 +47,5 @@ $ java -jar jclient.jar --server.port=6114 (--mode=rfid) --ip=192.168.86.23 --ta
 	- `/cmd/{command}` : cmd 커맨드를 실행한다 
 	- `/chrome/reboot` : 크롬을 종료한 후 batUrl에 작성된 bat file을 실행한다
          - 기본 : chrome.exe 실행
-	- `/` : 
+	- `/jclient/download` : target 서버에서 jclient 파일을 받아온다.
 ---
