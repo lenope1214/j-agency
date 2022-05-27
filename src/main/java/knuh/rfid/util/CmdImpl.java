@@ -5,15 +5,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CmdImpl implements CmdInterface{
-    @Value("${batUrl}")
+    @Value("${batUrl:start chrome.exe}")
     String batUrl;
 
-    public String reboot() {
+    public String chromeReboot() {
         if (killChrome()) return runBat() ? "success reboot" : "failed to open chrome";
         return "failed to kill chrome";
     }
 
     public boolean runBat() {
+        if(this.batUrl != null){
         return runCmd(this.batUrl);
+        }
+        return false;
     }
 }

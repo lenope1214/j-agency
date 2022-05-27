@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @Component
 public class ExtApi {
     private final int ms = 2000;
-    @Value("${target}")
+    @Value("${target:}")
     String target;
 
     public boolean pingCheck()  {

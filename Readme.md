@@ -38,3 +38,13 @@ $ java -jar jclient.jar --server.port=6114 (--mode=rfid) --ip=192.168.86.23 --ta
 2. 클라이언트 브라우저에서 shutdown 플래그 송신 
 3. 크롬 닫기 및 실행 bat파일 실행
 4. target으로부터 jclient.jar C:/Jsolution/jclient.jar 다운로드
+
+---
+- apidoc
+    - `/poweroff` : 컴퓨터를 즉시 종료한다
+    - `/reboot` : 컴퓨터를 즉시 재부팅한다
+	- `/cmd/{command}` : cmd 커맨드를 실행한다 
+	- `/chrome/reboot` : 크롬을 종료한 후 batUrl에 작성된 bat file을 실행한다
+         - 기본 : chrome.exe 실행
+	- `/` : 
+---

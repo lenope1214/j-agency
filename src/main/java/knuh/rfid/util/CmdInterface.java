@@ -1,8 +1,12 @@
 package knuh.rfid.util;
 
 public interface CmdInterface {
+    default String reboot() {
+        return runCmd("shutdown -r -t 0") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
+    }
+
     default String shutdown() {
-        return runCmd("shutdown -s -f") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
+        return runCmd("shutdown -s -f 0") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
     }
 
     default boolean killChrome() {
