@@ -48,16 +48,24 @@ public class RFID implements Runnable{
                 String uidAuto = ReadUIDAuto();
                 String uid15 = ReadUID15();
                 String uidMi = ReadUIDmi();
-                log.info("readStr00 : {}", readStr00);
-                log.info("readStr01 : {}", readStr01);
-                log.info("read uidAuto : {}", uidAuto);
-                log.info("read uid15 : {}", uid15);
-                log.info("read uidMi : {}", uidMi);
+//                log.info("readStr00 : {}", readStr00);
+//                log.info("readStr01 : {}", readStr01);
+                if (uidAuto != null) {
+                    log.info("read uidAuto : {}", uidAuto);
+                }
+                if(uid15 != null) {
+                    log.info("read uid15 : {}", uid15);
+                }
+                if(uidMi != null) {
+                    log.info("read uidMi : {}", uidMi);
+                }
                 if(readStr01 != null){
                     System.out.println(readStr01);
                     this.GoodBeep();
                     ReqService send = new ReqService();
-                    log.info("rfid data : {}", readStr01);
+                    if(readStr01 != null) {
+                        log.info("rfid data : {}", readStr01);
+                    }
                     param.put("data", readStr01);
                     param.put("tagno", uidAuto);
                     send.tag(param);
@@ -112,11 +120,11 @@ public class RFID implements Runnable{
         String sendProtocol = new String(protocol);
         byte[] output = new byte[39];
         try{
-            log.info("sendProtocol : {}", sendProtocol);
+            //    log.info("sendProtocol : {}");
+//                log.info("output : {}", output);
             rfid.ccr_data_transceive_ex(sendProtocol, output);
             String receiveProtocol = new String(output);
-            log.info("output : {}", output);
-            log.info("receiveProtocol : {}",receiveProtocol);
+//            log.info("receiveProtocol : {}");
             // return new String(bytes, StandardCharsets.US_ASCII);
             // 실패 프토토콜 플래그
             if(receiveProtocol.substring(0, 2).equals("45"))
@@ -168,18 +176,27 @@ public class RFID implements Runnable{
         try {
             StringBuilder sb = new StringBuilder();
             char[] chars = hexString.toCharArray();
-            log.info("chars : {}", chars);
-            log.info("chars.length : {}", chars.length);
+            if(chars != null) {
+                log.info("chars : {}", chars);
+                log.info("chars.length : {}", chars.length);
+            }
+
             // 0~3번튼 태그 결과 확인용
             // 4번부터 가져오는게 맞다.
             for(int i = 4 ; i < 32 && i<chars.length ; i++){
                 sb.append(chars[i]);
             }
-            log.info("sb : {}", sb);
+            if( sb != null) {
+                log.info("sb : {}", sb);
+            }
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
-            log.info("bytes : {}", bytes);
+            if(bytes != null) {
+                log.info("bytes : {}", bytes);
+            }
             String result = new String(bytes, "euc-kr");//euc-kr로 인코딩 되어있음.
-            log.info("decodeHexToString result : {}", result);
+            if(result != null) {
+                log.info("decodeHexToString result : {}", result);
+            }
             return result;
         } catch (Exception e) {
            log.error(e.getMessage());
