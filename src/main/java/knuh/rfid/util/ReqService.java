@@ -29,6 +29,7 @@ public class ReqService {
             params.put("pid", data[0]);
             params.put("ip", input.get("ip"));
             params.put("pathngnm", data[1]);
+            params.put("tagno", input.get("tagno"));
    
             System.out.println("파라미터 :" + params.toString());
             String json = JsonFormatter(params);

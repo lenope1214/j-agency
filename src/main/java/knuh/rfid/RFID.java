@@ -43,13 +43,23 @@ public class RFID implements Runnable{
 		
         while(r.ccr_device_find()) {
             try {
-                String readStr = Reader();
-                if(readStr != null){
-                    System.out.println(readStr);
+                String readStr00 = Reader("00");
+                String readStr01 = Reader("01");
+                String uidAuto = ReadUIDAuto();
+                String uid15 = ReadUID15();
+                String uidMi = ReadUIDmi();
+                log.info("readStr00 : {}", readStr00);
+                log.info("readStr01 : {}", readStr01);
+                log.info("read uidAuto : {}", uidAuto);
+                log.info("read uid15 : {}", uid15);
+                log.info("read uidMi : {}", uidMi);
+                if(readStr01 != null){
+                    System.out.println(readStr01);
                     this.GoodBeep();
                     ReqService send = new ReqService();
-                    log.info("rfid data : {}", readStr);
-                    param.put("data", readStr);
+                    log.info("rfid data : {}", readStr01);
+                    param.put("data", readStr01);
+                    param.put("tagno", uidAuto);
                     send.tag(param);
                     try{
                         Thread.sleep(5000);
@@ -61,37 +71,52 @@ public class RFID implements Runnable{
         }
     }
 
-    public void Writer(String pid) {
-        RFIDLibrary rfid = RFIDLibrary.INSTANCE;
-        byte[] output = new byte[39];
-        try {
-            String hexString = byteArrayToHexString(pid.getBytes("UTF-8"));
-            for(int i = 0; i < (32-hexString.length())/2 ; i++){
-                hexString = hexString + "20";
-            }
-            String sendProtocol = new String("4301"+ hexString);
-            rfid.ccr_data_transceive_ex(sendProtocol, output);
-            this.GoodBeep();
-        } catch (Exception e) {
-            System.out.println("error : " + e);
-            this.BadBeep();
-        }
-        try{
-          
-        }catch(Exception e){
-            System.out.println("error : " + e);
-            this.BadBeep();
-        }
 
+    public String ReadUIDAuto() {
+        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+        String protocol = "44002020202020202020202020202020202053";
+        String sendProtocol = new String(protocol);
+        return read(sendProtocol);
     }
 
-    public String Reader() {
+    public String ReadUID15() {
+        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+        String protocol = "44022020202020202020202020202020202053";
+        String sendProtocol = new String(protocol);
+        return read(sendProtocol);
+    }
+
+    public String ReadUIDmi() {
+        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+        String protocol = "44012020202020202020202020202020202053";
+        String sendProtocol = new String(protocol);
+        return read(sendProtocol);
+    }
+
+    public String Reader(String sector) {
+        // 52가 Read 하겠다는 뜻
+        // 5201 -> Read 01 섹터
+        // mifare 섹터는 00~03 섹터로 구성되어 있음
+        // 15693 섹터는 00~01 섹터로 구성되어 있음
+        if(sector == null)sector = "01"; // 기본으로 01을 사용함
+        String protocol = "52"+sector+"2020202020202020202020202020202053";
+        String sendProtocol = new String(protocol);
+        return read(sendProtocol);
+    }
+
+    private String read(String protocol){
         RFIDLibrary rfid = RFIDLibrary.INSTANCE;
-        String sendProtocol = new String("52012020202020202020202020202020202053");
+        // 52가 Read 하겠다는 뜻
+        // 5201 -> Read 01 섹터
+        // 섹터는 01~04섹터로 구성되어 있음
+        String sendProtocol = new String(protocol);
         byte[] output = new byte[39];
         try{
+            log.info("sendProtocol : {}", sendProtocol);
             rfid.ccr_data_transceive_ex(sendProtocol, output);
             String receiveProtocol = new String(output);
+            log.info("output : {}", output);
+            log.info("receiveProtocol : {}",receiveProtocol);
             // return new String(bytes, StandardCharsets.US_ASCII);
             // 실패 프토토콜 플래그
             if(receiveProtocol.substring(0, 2).equals("45"))
@@ -101,7 +126,7 @@ public class RFID implements Runnable{
             System.out.println("error : " + e);
             this.BadBeep();
             return null;
-        }   
+        }
     }
 
     public void GoodBeep() {
@@ -143,15 +168,22 @@ public class RFID implements Runnable{
         try {
             StringBuilder sb = new StringBuilder();
             char[] chars = hexString.toCharArray();
-            // 문자열 32비트 자르기 -> 최대 32비트로 들어감. 한글로 7글자 까지 가능
-            for(int i = 0 ; i < 32 && i<chars.length ; i++){
+            log.info("chars : {}", chars);
+            log.info("chars.length : {}", chars.length);
+            // 0~3번튼 태그 결과 확인용
+            // 4번부터 가져오는게 맞다.
+            for(int i = 4 ; i < 32 && i<chars.length ; i++){
                 sb.append(chars[i]);
             }
+            log.info("sb : {}", sb);
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
+            log.info("bytes : {}", bytes);
             String result = new String(bytes, "euc-kr");//euc-kr로 인코딩 되어있음.
+            log.info("decodeHexToString result : {}", result);
             return result;
         } catch (Exception e) {
-           System.out.println(e);
+           log.error(e.getMessage());
+           e.printStackTrace();
            return null;
         }
     }
