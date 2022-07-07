@@ -1,5 +1,8 @@
 package knuh.rfid;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class JNIRFID {	
 	public native void test();
 	public native boolean ccr_device_find();
@@ -10,9 +13,10 @@ public class JNIRFID {
 		System.out.println("now loading CCR_32...");
 		try {
 			System.loadLibrary("CCR_32");
-//			Runtime.getRuntime().load("d:/git/MyRepo/javaDirectory_32bit/rfid/CCR_32.dll");
 		}catch(Exception e) {
 			e.printStackTrace();
+			log.error("CCR_32.dll 파일 로딩 실패");
+			System.exit(0);
 		}
 //		
 		System.out.println("loading has been Finished!");

@@ -33,45 +33,32 @@ public class RFID implements Runnable{
     // RFIDLibrary r = RFIDLibrary.INSTANCE;
     @Override
     public void run() {
-        System.out.println("Starting main!! ");     
+        log.info("Starting main!! ");
         
 		// 클래스 생성 초기화하
 		RFIDLibrary r = RFIDLibrary.INSTANCE;
 
 		// 리더기가 연결되어 있는지
-		System.out.println("RFID READER DEVICE : " + r.ccr_device_find());
+		log.info("RFID READER DEVICE : " + r.ccr_device_find());
 		
         while(r.ccr_device_find()) {
             try {
-                String readStr00 = Reader("00");
+//                String readStr00 = Reader("00");
                 String readStr01 = Reader("01");
-                String uidAuto = ReadUIDAuto();
-                String uid15 = ReadUID15();
-                String uidMi = ReadUIDmi();
-//                log.info("readStr00 : {}", readStr00);
-//                log.info("readStr01 : {}", readStr01);
-                if (uidAuto != null) {
-                    log.info("read uidAuto : {}", uidAuto);
-                }
-                if(uid15 != null) {
-                    log.info("read uid15 : {}", uid15);
-                }
-                if(uidMi != null) {
-                    log.info("read uidMi : {}", uidMi);
-                }
+
                 if(readStr01 != null){
-                    System.out.println(readStr01);
+                    log.info("readStr01 : {}", readStr01);
                     this.GoodBeep();
                     ReqService send = new ReqService();
-                    if(readStr01 != null) {
-                        log.info("rfid data : {}", readStr01);
-                    }
+//                    param.put("data00", readStr00);
                     param.put("data", readStr01);
-                    param.put("tagno", uidAuto);
                     send.tag(param);
                     try{
                         Thread.sleep(5000);
-                    }catch(Exception e){System.out.println(e);}
+                    }catch(Exception e){
+                        e.printStackTrace();
+                        log.error("RFID.JAVA - ERROR MESSAGE : {}",e.getMessage());
+                    }
                 }
             } catch (Exception e) {
                System.out.println(e);
@@ -120,11 +107,8 @@ public class RFID implements Runnable{
         String sendProtocol = new String(protocol);
         byte[] output = new byte[39];
         try{
-            //    log.info("sendProtocol : {}");
-//                log.info("output : {}", output);
             rfid.ccr_data_transceive_ex(sendProtocol, output);
             String receiveProtocol = new String(output);
-//            log.info("receiveProtocol : {}");
             // return new String(bytes, StandardCharsets.US_ASCII);
             // 실패 프토토콜 플래그
             if(receiveProtocol.substring(0, 2).equals("45"))
