@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'knuh'
-version = '1.01'
+version = '1.02'
 sourceCompatibility = '8'
 
 configurations {

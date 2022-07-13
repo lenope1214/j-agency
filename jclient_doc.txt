@@ -1,0 +1,17 @@
+cmd로 실행 시 properties를 넘기기 위해선 -- 를 사용한다.
+properties 목록
+ server.port = 실행할 포트 입력
+ mode= rfid 혹은 미입력.  미입력시 rfid api 사용 불가
+ ip = 전광판 ip 입력
+ target = 목적지, 메인서버 url입력 http까지 포함해야 함.
+ batUrl = 크롬 재시작할 bat파일 경로 입력. 파일명까지 입력해야 함. ex) F:\test.bat
+
+ex) jclient.jar server.port=6114 --mode=rfid --ip=192.168.0.1 target=https://192.168.0.2 batUrl=F\test.bat
+
+6114로 시작했을 때 예시,
+
+ip:6114/poweroff
+ 컴퓨터 전원을 종료한다
+
+ip:6114/chrome/reboot
+ 크롬을 전체 종료 후 batUrl 경로의 bat파일을 실행한다.

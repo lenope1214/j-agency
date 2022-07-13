@@ -48,7 +48,7 @@ public class RFID implements Runnable{
             try {
                 String read = Reader();
 
-                if(read != null){
+                if(read != null && read.length()>0 && read.split(" ").length == 3){
                     log.info("읽은 데이터 : {}", read);
                     this.GoodBeep();
 
@@ -58,7 +58,7 @@ public class RFID implements Runnable{
                     }
                     send.tag(param);
                     try{
-                        Thread.sleep(5000);
+                        Thread.sleep(2000);
                     }catch(Exception e){
                         e.printStackTrace();
                         log.error("RFID.JAVA - ERROR MESSAGE : {}",e.getMessage());
