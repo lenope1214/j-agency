@@ -3,8 +3,8 @@ package knuh.rfid;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class JNIRFID {	
-	public native void test();
+public class JNIRFID {
+		public native void test();
 	public native boolean ccr_device_find();
 
 	public native boolean ccr_data_transceive_ex(byte a[]);

@@ -2,6 +2,9 @@ package knuh.rfid.util;
 
 import java.util.HashMap;
 
+import com.sun.jna.Native;
+import com.sun.jna.Platform;
+import knuh.rfid.RFIDLibrary;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -26,6 +29,7 @@ public class AppListner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         log.info("mode : {}", mode);
         log.info("ip : {}", ip);
         log.info("target : {}", target);
@@ -33,6 +37,7 @@ public class AppListner implements CommandLineRunner {
         if (mode != null && mode.equals("rfid")) {
             HashMap<String, Object> params = new HashMap<>();
             params.put("ip", ip);
+            params.put("target", target);
             RFID rfid = new RFID(params);
             Thread thread = new Thread(rfid);
             thread.start();

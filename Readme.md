@@ -49,3 +49,9 @@ $ java -jar jclient.jar --server.port=6114 (--mode=rfid) --ip=192.168.86.23 --ta
          - 기본 : chrome.exe 실행
 	- `/jclient/download` : target 서버에서 jclient 파일을 받아온다.
 ---
+
+RFID 모드로 실행했을 때, %1은(는) 올바른 Win32 응용 프로그램이 아닙니다 오류 발생 시
+32bit jdk로 지정 후 실행한다.
+
+---
+

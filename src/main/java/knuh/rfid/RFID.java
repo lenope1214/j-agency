@@ -15,6 +15,9 @@ public class RFID implements Runnable{
     // private final ApplicationArguments appArgs;
     private final HashMap<String, Object> param;
 
+    @Autowired
+    private ReqService send;
+
 
     @Autowired
     public RFID(HashMap<String, Object> args){
@@ -43,15 +46,16 @@ public class RFID implements Runnable{
 		
         while(r.ccr_device_find()) {
             try {
-//                String readStr00 = Reader("00");
-                String readStr01 = Reader("01");
+                String read = Reader();
 
-                if(readStr01 != null){
-                    log.info("readStr01 : {}", readStr01);
+                if(read != null){
+                    log.info("읽은 데이터 : {}", read);
                     this.GoodBeep();
-                    ReqService send = new ReqService();
-//                    param.put("data00", readStr00);
-                    param.put("data", readStr01);
+
+                    param.put("data", read);
+                    if(send == null){
+                        send = new ReqService();
+                    }
                     send.tag(param);
                     try{
                         Thread.sleep(5000);
@@ -61,7 +65,8 @@ public class RFID implements Runnable{
                     }
                 }
             } catch (Exception e) {
-               System.out.println(e);
+                e.printStackTrace();
+               log.error(e.getMessage());
             }
         }
     }
@@ -88,15 +93,37 @@ public class RFID implements Runnable{
         return read(sendProtocol);
     }
 
-    public String Reader(String sector) {
+    public String Reader() {
         // 52가 Read 하겠다는 뜻
         // 5201 -> Read 01 섹터
         // mifare 섹터는 00~03 섹터로 구성되어 있음
-        // 15693 섹터는 00~01 섹터로 구성되어 있음
-        if(sector == null)sector = "01"; // 기본으로 01을 사용함
-        String protocol = "52"+sector+"2020202020202020202020202020202053";
-        String sendProtocol = new String(protocol);
-        return read(sendProtocol);
+        // 00, 03은 사용하지 않음
+
+        String sector01 = "52012020202020202020202020202020202053";
+        String sector02 = "52022020202020202020202020202020202050";
+//    log.info("read~~");
+        String sendProtocol = sector01;
+        String result = "";
+//        log.info("read 01");
+        String r01 = read(sendProtocol);
+//        log.info("res 01 : {}", result);
+        if(r01 != null){
+            result += r01;
+        }
+
+        sendProtocol = new String(sector02);
+//        log.info("read 02");
+        String r02 = read(sendProtocol);
+//        log.info("res 02 : {}", r02);
+        if(r02 != null) {
+            result += r02;
+        }
+//        log.info("result : {}", result);
+        // 데이터 포매팅
+        result = result.replaceAll(" ", "");
+        result = result.replaceAll("_", " ");
+//        log.info("변환 후 : {}", result);
+        return result;
     }
 
     private String read(String protocol){
@@ -112,12 +139,12 @@ public class RFID implements Runnable{
             // return new String(bytes, StandardCharsets.US_ASCII);
             // 실패 프토토콜 플래그
             if(receiveProtocol.substring(0, 2).equals("45"))
-                return null;
+                return "";
             return decodeHexToString(new String(output));
         }catch(Exception e){
             System.out.println("error : " + e);
             this.BadBeep();
-            return null;
+            return "";
         }
     }
 
@@ -161,8 +188,8 @@ public class RFID implements Runnable{
             StringBuilder sb = new StringBuilder();
             char[] chars = hexString.toCharArray();
             if(chars != null) {
-                log.info("chars : {}", chars);
-                log.info("chars.length : {}", chars.length);
+//                log.info("chars : {}", chars);
+//                log.info("chars.length : {}", chars.length);
             }
 
             // 0~3번튼 태그 결과 확인용
@@ -171,15 +198,15 @@ public class RFID implements Runnable{
                 sb.append(chars[i]);
             }
             if( sb != null) {
-                log.info("sb : {}", sb);
+//                log.info("sb : {}", sb);
             }
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
             if(bytes != null) {
-                log.info("bytes : {}", bytes);
+//                log.info("bytes : {}", bytes);
             }
             String result = new String(bytes, "euc-kr");//euc-kr로 인코딩 되어있음.
             if(result != null) {
-                log.info("decodeHexToString result : {}", result);
+//                log.info("decodeHexToString result : {}", result);
             }
             return result;
         } catch (Exception e) {

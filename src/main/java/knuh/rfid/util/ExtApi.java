@@ -31,9 +31,19 @@ public class ExtApi {
 
     public String containHttpProtocol(String fileUrl){
         // http(s) 프로토콜 설정이 없으면 기본으로 http 붙여줌
+//        log.info("containHttpProtocol fileUrl : {}", fileUrl);
         if(!fileUrl.matches("^(https?)://")){
             fileUrl = "http://"+fileUrl;
         }
+        if(fileUrl.startsWith("http://")){
+            fileUrl = fileUrl.replaceAll("http://", "");
+            fileUrl = "http://" + fileUrl;
+        }else if(fileUrl.startsWith("https://")){
+            fileUrl = fileUrl.replaceAll("https://", "");
+            fileUrl = "https://" + fileUrl;
+        }
+//        log.info("res - containHttpProtocol fileUrl : {}", fileUrl);
+
         return fileUrl;
     }
 }

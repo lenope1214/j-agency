@@ -14,7 +14,7 @@ public class StringBuilderTest {
     @Test
     public void 스프링빌더기본값테스트(){
         StringBuilder sb = new StringBuilder();
-        log.info("sb.toString() = " + sb.toString());
+//        log.info("sb.toString() = " + sb.toString());
         HashMap<String, Object> params = new HashMap<>();
         params.put("ip", "testip");
         RFID rfid = new RFID(params);
