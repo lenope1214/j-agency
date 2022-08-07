@@ -1,8 +1,6 @@
 package knuh.rfid.controller;
 
-import knuh.rfid.RFID;
 import knuh.rfid.util.CmdImpl;
-import knuh.rfid.util.CmdInterface;
 import knuh.rfid.util.ExtApi;
 import knuh.rfid.util.Storage;
 import lombok.extern.slf4j.Slf4j;
@@ -15,14 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Map;
 
 @RestController
 @Slf4j
