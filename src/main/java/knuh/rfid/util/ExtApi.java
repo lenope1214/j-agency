@@ -29,21 +29,21 @@ public class ExtApi {
     }
 
 
-    public String containHttpProtocol(String fileUrl){
+    public String containHttpProtocol(String url){
         // http(s) 프로토콜 설정이 없으면 기본으로 http 붙여줌
 //        log.info("containHttpProtocol fileUrl : {}", fileUrl);
-        if(!fileUrl.matches("^(https?)://")){
-            fileUrl = "http://"+fileUrl;
+        if(!url.matches("^(https?)://")){
+            url = "http://"+url;
         }
-        if(fileUrl.startsWith("http://")){
-            fileUrl = fileUrl.replaceAll("http://", "");
-            fileUrl = "http://" + fileUrl;
-        }else if(fileUrl.startsWith("https://")){
-            fileUrl = fileUrl.replaceAll("https://", "");
-            fileUrl = "https://" + fileUrl;
+        if(url.startsWith("http://")){
+            url = url.replaceAll("http://", "");
+            url = "http://" + url;
+        }else if(url.startsWith("https://")){
+            url = url.replaceAll("https://", "");
+            url = "https://" + url;
         }
-//        log.info("res - containHttpProtocol fileUrl : {}", fileUrl);
+        log.info("res - containHttpProtocol url : {}", url);
 
-        return fileUrl;
+        return url;
     }
 }

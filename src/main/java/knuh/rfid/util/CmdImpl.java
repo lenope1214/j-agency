@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CmdImpl implements CmdInterface{
+
+    // 크롬 배치파일이 없다면 기본으로 chrome을 실행한다.
     @Value("${batUrl:start chrome.exe}")
     String batUrl;
 
