@@ -80,6 +80,16 @@ public class Rest {
         }
     }
 
+    /**
+     * Target 서버에서 jclient 최신 버전을 다운로드한다.
+     * 이때 자기 자신(jclient.jar)가 실행 중이므로 jclient_temp.jar로 다운로드 받아서 저장.
+     * 저장 후 bat 파일을 실행한다.
+     *  bat 파일 로직
+     *  1. jclient.jar를 종료시키고
+     *  2. jclient.jar 를 삭제
+     *  3. jclient_temp.jar를 jclient.jar로 이름 변경한다.
+     *  4. 변경된 jclient.jar를 실행하는 bat를 실행한다.
+     */
     @GetMapping("/jclient/download")
     public ResponseEntity<Boolean> filedownload(HttpServletResponse response, @RequestParam(name = "downloadPath", required = false) String downloadPath) throws Exception {
         boolean result = versionManagerService.downloadJclient(downloadPath, true);

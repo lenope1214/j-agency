@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 
 public interface CmdInterface {
     default String reboot() {
-        return runCmd("shutdown -r -t 0") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
+        return runCmd("shutdown -r -t 0") ? "The machine has been reboot!" : "Failed to reboot that machine.";
     }
 
     default String shutdown() {
