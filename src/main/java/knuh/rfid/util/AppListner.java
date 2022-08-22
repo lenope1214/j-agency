@@ -49,7 +49,7 @@ public class AppListner implements CommandLineRunner {
         // ip가 입력 되어있다면, version 확인 후 재실행
         if(ip!=null && !ip.equals("null")){
             if(knuhApiService == null)knuhApiService = new KnuhApiServiceImpl();
-            String version = knuhApiService.get("/api/v1/jclient/version");
+            String version = knuhApiService.get("/api/v3/jclient/version");
             log.info("server - jclient - version : {}", version);
             log.info("local - jlcient - version : {}", appVersion);
 
