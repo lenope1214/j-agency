@@ -1,6 +1,7 @@
 package knuh.rfid.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 @Service
@@ -30,18 +32,18 @@ public class VersionManagerService {
     private CmdImpl cmd;
 
     /**
-     *
      * @param downloadPath jclient 다운로드 요청 api url
      * @return 성공 여부
      * @throws Exception 모든 에러에 대한 throw
      */
     public boolean downloadJclient(String downloadPath, boolean isReboot) throws Exception {
         URL url = null;
-        InputStream in = null;
-        FileOutputStream fileOutputStream = null;
+
+        // 파일 다운로드 여부 확인용
+        boolean isDownloaded = false;
         try {
 
-            String storeUrl = "jclient";
+            String storeUrl = "jsolution/jclient";
             String fileName = "new_jclient.jar";
             // 최종적으로 C:/Jsolution/jclient.jar
 
@@ -49,13 +51,10 @@ public class VersionManagerService {
             storeUrl = storage.pathValidation(storeUrl.split("/"));
 
             // 폴더 + 파일명으로 저장할 위치 파일 지정
-            File file = new File(storeUrl + "/" + fileName);
-            fileOutputStream = new FileOutputStream(file, false); // true 시 기존 파일이 남아있음, false 시 덮어씌움
+            storeUrl = storeUrl + "/" + fileName;
 
-            //파일이 존재하는 위치의 URL
-//                String fileUrl = target+"/api/v1/files/shop/11/test/plzme.txt/download";
-//            String fileUrl = target + "/files/download/jclient";
-            String fileUrl = target + "/api/v1/jclient";
+            //파일 다운로드할 URI 입력
+            String fileUrl = target + "/api/v3/system/download/jclient";
 
 
             // 특정 url을 지정했다면, 그것으로 지정한다.
@@ -70,31 +69,48 @@ public class VersionManagerService {
             url = new URL(fileUrl);
             // 만약 프로토콜이 https 라면 https SSL을 무시하는 로직을 수행해주어야 한다.('https 인증서 무시' 라는 키워드로 구글에 검색하면 많이 나옵니다.)
 
-            in = url.openStream();
+            log.info("jclient request url : {}", url);
+            log.info("jclient store path : {}", storeUrl);
+            File resFile = fileDownOnHttp(url, storeUrl);
 
-            log.info("파일 다운 시작!");
-            while (true) {
-                //파일을 읽어온다.
-                int data = in.read();
-                if (data == -1) {
-                    log.info("파일 다운 종료!");
-                    break;
-                }
-                //파일을 쓴다.
-                fileOutputStream.write(data);
-            }
-
-            in.close();
-            fileOutputStream.close();
-            // 파일이 정상적으로 다운이 됐다면 재부팅.
-            if(isReboot)cmd.runCmd("shutdown -r -t 0"); // 즉시 재부팅 명령어
+            isDownloaded = resFile.exists();
+            // 파일이 정상적으로 다운이 됐다면
+            //  1.
+            if (isReboot) cmd.reboot(); // 즉시 재부팅 명령어
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
-        } finally {
-            if (in != null) in.close();
-            if (fileOutputStream != null) fileOutputStream.close();
-            return true;
         }
+        return isDownloaded;
+    }
+
+    /**
+     * @param url
+     * @param fileName
+     * @return
+     * @throws MalformedURLException
+     * @throws IOException
+     */
+    /**
+     * url과 fileName을 받는다.
+     * http url에서 파일을 가져온다.
+     * fileName으로 해당 파일을 저장한다.
+     * <p>
+     * 이미 있으면 덮어씌운다고 한다..
+     *
+     * @param url      파일을 받을 http 경로
+     * @param filePath 저장할때 사용할 파일 경로 + 명 example = c://jsolution/jclient/jclient.jar
+     * @return 가져온 File
+     * @throws MalformedURLException 파일이 없을때 오류,
+     * @throws IOException           데이터 처리 작업 중 오류,
+     */
+    public File fileDownOnHttp(String url, String filePath) throws MalformedURLException, IOException {
+        return fileDownOnHttp(new URL(url), filePath);
+    }
+
+    public File fileDownOnHttp(URL url, String filePath) throws MalformedURLException, IOException {
+        File f = new File(filePath);
+        FileUtils.copyURLToFile(url, f);
+        return f;
     }
 }

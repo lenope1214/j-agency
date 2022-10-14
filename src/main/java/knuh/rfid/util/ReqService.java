@@ -11,16 +11,22 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 @Component
 @Slf4j
 public class ReqService {
 
-    @Autowired
+    @Resource
     private ExtApi extApi;
 
-    public Boolean tag(HashMap<String, Object> input) {
+    @Value("${api.url.health.tag:/api/v2/health/tag}")
+    private String healthTagUrl;
+
+    public void tag(HashMap<String, Object> input) {
         try {
             String target = input.get("target").toString();
 
@@ -29,30 +35,28 @@ public class ReqService {
             }
 
             target = extApi.containHttpProtocol(target);
-            URL url = new URL(target + "/api/v2/health/tag");
+            log.info("healthTagUrl : {}", healthTagUrl);
+            URL url = new URL(target + healthTagUrl);
+//            URL url = new URL(target + "/api/v2/health/tag");
+//            URL url = new URL(target + healthTagUrl);
+
 //            log.info("URL : " + url);
             String[] data = input.get("data").toString().split(" ");
             HashMap<String, Object> params = new LinkedHashMap<>();
             try {
                 params.put("pid", data[0]);
-            } catch (Exception e) {
-
-            }
+            } catch (Exception ignored) {}
             try {
                 params.put("tagno", data[1]);
-            } catch (Exception e) {
-
-            }
+            } catch (Exception ignored) {}
             try {
                 params.put("pathngnm", data[2]);
-            } catch (Exception e) {
-
-            }
+            } catch (Exception ignored) {}
             params.put("ip", input.get("ip"));
 
 //            log.info("파라미터 :" + params.toString());
             String json = JsonFormatter(params);
-            byte[] requsetBody = json.toString().getBytes("UTF-8");
+            byte[] requestBody = json.toString().getBytes("UTF-8");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -60,17 +64,15 @@ public class ReqService {
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setDoOutput(true);
             try {
-                conn.getOutputStream().write(requsetBody);
-            }catch(Exception e){
-                return false;
+                conn.getOutputStream().write(requestBody);
+            } catch (Exception e) {
+                return;
             }
             BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
 
-            return true;
         } catch (Exception e) {
             log.error("TAG ERROR MESSAGE : {}", e.getMessage());
             e.printStackTrace();
-            return false;
         }
     }
 

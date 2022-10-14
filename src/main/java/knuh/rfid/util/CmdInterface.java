@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 public interface CmdInterface {
-    default String reboot() {
-        return runCmd("shutdown -r -t 0") ? "The machine has been reboot!" : "Failed to reboot that machine.";
+    default void reboot() {
+        runCmd("shutdown -r -t 0");
     }
 
-    default String shutdown() {
-        return runCmd("shutdown -s -t 0") ? "The machine has been shutdown!" : "Failed to shutdown that machine.";
+    default void shutdown() {
+        runCmd("shutdown -s -t 0");
     }
 
     default boolean killChrome() {
@@ -39,14 +39,13 @@ public interface CmdInterface {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(myProcess.getInputStream()));
             String line = null;
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(command);
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
                 sb.append("\n");
             }
-            String result = sb.toString();
-            return result;
+            return sb.toString();
         } catch (Exception e) {
             return null;
         }

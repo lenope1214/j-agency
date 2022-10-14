@@ -10,40 +10,37 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class ExtApi {
-    private final int ms = 2000;
     @Value("${target:}")
     String target;
 
-    public boolean pingCheck()  {
-        String t =target.replaceAll(":[0-9]+$", ""); // 포트번호 삭제
+    public boolean pingCheck() {
+        String t = target.replaceAll(":[0-9]+$", ""); // 포트번호 삭제
         t = t.replaceAll("\\\\", "/"); // \ -> /로 변경
         t = t.replaceAll("http.*?//", " "); // http(s):// 삭제
-        try{
+        try {
             InetAddress inet = InetAddress.getByName(t);
             // 주어진 밀리세컨드 내에 원격호스트에 접근 가능하면 true, 아니면 false
             // ms = 1/1000 second
+            int ms = 2000;
             return inet.isReachable(ms);
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
 
-    public String containHttpProtocol(String url){
+    public String containHttpProtocol(String url) {
         // http(s) 프로토콜 설정이 없으면 기본으로 http 붙여줌
 //        log.info("containHttpProtocol fileUrl : {}", fileUrl);
-        if(!url.matches("^(https?)://")){
-            url = "http://"+url;
+        log.info("{} is matches ? {}", url, isStartHttp(url));
+        if (isStartHttp(url)) {
+            return url;
         }
-        if(url.startsWith("http://")){
-            url = url.replaceAll("http://", "");
-            url = "http://" + url;
-        }else if(url.startsWith("https://")){
-            url = url.replaceAll("https://", "");
-            url = "https://" + url;
-        }
-        log.info("res - containHttpProtocol url : {}", url);
-
+        url = "http://" + url;
         return url;
+    }
+
+    private boolean isStartHttp(String url) {
+        return url.startsWith("http");
     }
 }
