@@ -1,4 +1,0 @@
-ip=t_ip
-target=t_target
-mode=t_mode
-batUrl=t_batUrl

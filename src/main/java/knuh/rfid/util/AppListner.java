@@ -59,16 +59,18 @@ public class AppListner implements CommandLineRunner {
             KnuhResType extension = gson.fromJson(version, KnuhResType.class);
             if (extension == null) {
 //                throw new IllegalStateException("jclient 버전 확인에 실패했습니다.");
-                log.error("jclient 버전 확인에 실패했습니다. 프로그램을 종료합니다.");
-                Thread.sleep(5000);
-                System.exit(0);
+                log.error("jclient 버전 확인에 실패했습니다.");
+//                Thread.sleep(5000);
+//                System.exit(0);
+                extension = new KnuhResType();
+                extension.setData("");
             }
             String data = extension.getData();
             log.info("server - jclient - version : {}", data);
             log.info("local - jlcient - version : {}", appVersion);
 
             // 데이터 요청에 실패하거나 버전이 같으면 안 함.
-            if (!data.contains("\"success\":false") && !data.equals(appVersion)) {
+            if (!data.contains("\"success\":false") && !data.equals(appVersion) && !data.isEmpty()) {
                 // 버전이 다르면, 최신 데이터(Jclient.jar) 받아오고
                 // 업데이트 후 실행하는 배치파일 실행
 

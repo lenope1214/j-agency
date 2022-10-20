@@ -44,29 +44,30 @@ public class RFID implements Runnable{
 		// 리더기가 연결되어 있는지
 		log.info("RFID READER DEVICE : " + r.ccr_device_find());
 		
-        while(r.ccr_device_find()) {
-            try {
-                String read = Reader();
+        while(true) {
+            if(r.ccr_device_find()){
+                try {
+                    String read = Reader();
 
-                if(read != null && read.length()>0 && read.split(" ").length == 3){
-                    log.info("읽은 데이터 : {}", read);
-                    this.GoodBeep();
+                    if(read != null && read.length()>0 && read.split(" ").length == 3){
+                        log.info("읽은 데이터 : {}", read);
+                        this.GoodBeep();
 
-                    param.put("data", read);
-                    if(send == null){
-                        send = new ReqService();
+                        param.put("data", read);
+                        if(send == null){
+                            send = new ReqService();
+                        }
+                        send.tag(param);
+                        try{
+                            Thread.sleep(2000);
+                        }catch(Exception e){
+                            log.error("RFID.JAVA - SLEEP ERROR - MESSAGE : {}",e.getMessage());
+                        }
                     }
-                    send.tag(param);
-                    try{
-                        Thread.sleep(2000);
-                    }catch(Exception e){
-                        e.printStackTrace();
-                        log.error("RFID.JAVA - ERROR MESSAGE : {}",e.getMessage());
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.error(e.getMessage());
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-               log.error(e.getMessage());
             }
         }
     }
@@ -187,28 +188,19 @@ public class RFID implements Runnable{
         try {
             StringBuilder sb = new StringBuilder();
             char[] chars = hexString.toCharArray();
-            if(chars != null) {
-//                log.info("chars : {}", chars);
+            //                log.info("chars : {}", chars);
 //                log.info("chars.length : {}", chars.length);
-            }
 
             // 0~3번튼 태그 결과 확인용
             // 4번부터 가져오는게 맞다.
             for(int i = 4 ; i < 32 && i<chars.length ; i++){
                 sb.append(chars[i]);
             }
-            if( sb != null) {
-//                log.info("sb : {}", sb);
-            }
+            //                log.info("sb : {}", sb);
             byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
-            if(bytes != null) {
-//                log.info("bytes : {}", bytes);
-            }
-            String result = new String(bytes, "euc-kr");//euc-kr로 인코딩 되어있음.
-            if(result != null) {
-//                log.info("decodeHexToString result : {}", result);
-            }
-            return result;
+            //                log.info("bytes : {}", bytes);
+            //                log.info("decodeHexToString result : {}", result);
+            return new String(bytes, "euc-kr");
         } catch (Exception e) {
            log.error(e.getMessage());
            e.printStackTrace();
