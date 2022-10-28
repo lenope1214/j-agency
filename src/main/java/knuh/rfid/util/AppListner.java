@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.google.gson.Gson;
 import knuh.rfid.dto.KnuhResType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +15,7 @@ import knuh.rfid.RFID;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AppListner implements CommandLineRunner {
 
     // : 을 붙여서 기본값을 부여함.   java jclient --mode 이런 properties를 입력 안 했을때 오류 나지 않도록 설정해준다.
@@ -30,16 +32,13 @@ public class AppListner implements CommandLineRunner {
     private String appVersion;
 
 
-    @Autowired
-    private KnuhApiServiceImpl knuhApiService;
+    private final KnuhApiServiceImpl knuhApiService;
 
-    @Autowired
-    private VersionManagerService versionManagerService;
+    private final VersionManagerService versionManagerService;
 
-    @Autowired
-    private CmdImpl cmdService;
+    private final CmdImpl cmdService;
 
-
+    private final RFID rfid;
 
     @Override
     public void run(String... args) throws Exception {
@@ -52,7 +51,7 @@ public class AppListner implements CommandLineRunner {
 
         // ip가 입력 되어있다면, version 확인 후 재실행
         if (ip != null && !ip.equals("null")) {
-            if (knuhApiService == null) knuhApiService = new KnuhApiServiceImpl();
+//            if (knuhApiService == null) knuhApiService = new KnuhApiServiceImpl();
             Gson gson = new Gson();
 
             String version = knuhApiService.get("/api/v3/system/extension/version/jclient");
@@ -107,7 +106,7 @@ public class AppListner implements CommandLineRunner {
             HashMap<String, Object> params = new HashMap<>();
             params.put("ip", ip);
             params.put("target", target);
-            RFID rfid = new RFID(params);
+            rfid.init(params);
             Thread thread = new Thread(rfid);
             thread.start();
         } else

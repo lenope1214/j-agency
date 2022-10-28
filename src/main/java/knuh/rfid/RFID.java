@@ -4,34 +4,33 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import knuh.rfid.util.ReqService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Slf4j
+@Component
 public class RFID implements Runnable{
     // private final ApplicationArguments appArgs;
-    private final HashMap<String, Object> param;
+    private HashMap<String, Object> param;
 
-    @Autowired
-    private ReqService send;
+    private final ReqService send;
 
-
-    @Autowired
-    public RFID(HashMap<String, Object> args){
-        param = args;
-        // ModelMapper modelMapper = new ModelMapper();
-        // param = modelMapper.map(args, ParamDto.Rfid.class);
+    @Value("${debug:false}")
+    String debug;
+    private boolean isDebug(){
+        return this.debug.equals("true");
     }
 
-    public static void getPaths() {
-		String path = System.getProperty("java.library.path");
-		Arrays.stream(path.split(";")).forEach(s -> {
-			System.out.println(s);
-		});
-	}
+    public void init(HashMap<String, Object> args){
+        this.param = args;
+    }
 
     // RFIDLibrary r = RFIDLibrary.INSTANCE;
     @Override
@@ -41,33 +40,37 @@ public class RFID implements Runnable{
 		// 클래스 생성 초기화하
 		RFIDLibrary r = RFIDLibrary.INSTANCE;
 
-		// 리더기가 연결되어 있는지
-		log.info("RFID READER DEVICE : " + r.ccr_device_find());
-		
         while(true) {
+		    // 리더기가 연결되어 있는지
             if(r.ccr_device_find()){
                 try {
+                    if(isDebug())log.info("읽기 시작");
                     String read = Reader();
 
+                    log.info("읽은 데이터 : {}", read);
                     if(read != null && read.length()>0 && read.split(" ").length == 3){
-                        log.info("읽은 데이터 : {}", read);
                         this.GoodBeep();
 
                         param.put("data", read);
-                        if(send == null){
-                            send = new ReqService();
-                        }
+
+//                        if(send == null){
+//                            send = new ReqService();
+//                        }
+                        if(isDebug())log.info("읽은 데이터 전송 시작");
                         send.tag(param);
-                        try{
-                            Thread.sleep(2000);
-                        }catch(Exception e){
-                            log.error("RFID.JAVA - SLEEP ERROR - MESSAGE : {}",e.getMessage());
-                        }
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error(e.getMessage());
                 }
+            }else{
+                log.error("RFID READER DEVICE IS NOT CONNECTED!");
+            }
+            try{
+                Thread.sleep(500);
+            }catch(Exception e){
+                log.error("RFID.JAVA - SLEEP ERROR - MESSAGE : {}",e.getMessage());
             }
         }
     }

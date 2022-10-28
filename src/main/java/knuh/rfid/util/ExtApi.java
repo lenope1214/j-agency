@@ -3,12 +3,13 @@ package knuh.rfid.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.util.regex.Pattern;
 
 @Slf4j
-@Component
+@Service
 public class ExtApi {
     @Value("${target:}")
     String target;
@@ -32,7 +33,7 @@ public class ExtApi {
     public String containHttpProtocol(String url) {
         // http(s) 프로토콜 설정이 없으면 기본으로 http 붙여줌
 //        log.info("containHttpProtocol fileUrl : {}", fileUrl);
-        log.info("{} is matches ? {}", url, isStartHttp(url));
+        log.info("{} is url starts http ? {}", url, isStartHttp(url));
         if (isStartHttp(url)) {
             return url;
         }

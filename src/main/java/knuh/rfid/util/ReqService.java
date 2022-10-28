@@ -13,63 +13,68 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-@Component
+@Service
 @Slf4j
 public class ReqService {
 
-    @Resource
-    private ExtApi extApi;
+    private final ExtApi extApi;
 
-    @Value("${api.url.health.tag:/api/v2/health/tag}")
+    private final String DEFAULT_HEALTH_TARGET_URL = "/api/v2/health/tag";
+    @Value("${api.url.health.tag}")
     private String healthTagUrl;
+
+    public ReqService(@Autowired ExtApi extApi){
+        this.extApi = extApi;
+
+        log.info("ReqService 초기화 - healthTagUrl : {}", healthTagUrl);
+    }
 
     public void tag(HashMap<String, Object> input) {
         try {
             String target = input.get("target").toString();
 
-            if (extApi == null) {
-                extApi = new ExtApi();
-            }
-
             target = extApi.containHttpProtocol(target);
             log.info("healthTagUrl : {}", healthTagUrl);
-            URL url = new URL(target + healthTagUrl);
+            if(healthTagUrl == null || healthTagUrl.isEmpty()){
+                healthTagUrl = DEFAULT_HEALTH_TARGET_URL;
+            }
+            String apiUrl = target + healthTagUrl;
+            URL url = new URL(apiUrl);
 //            URL url = new URL(target + "/api/v2/health/tag");
 //            URL url = new URL(target + healthTagUrl);
 
 //            log.info("URL : " + url);
-            String[] data = input.get("data").toString().split(" ");
+            String[] data = null;
             HashMap<String, Object> params = new LinkedHashMap<>();
-            try {
+
+            try{
+                data = input.get("data").toString().split(" ");
                 params.put("pid", data[0]);
-            } catch (Exception ignored) {}
-            try {
                 params.put("tagno", data[1]);
-            } catch (Exception ignored) {}
-            try {
                 params.put("pathngnm", data[2]);
-            } catch (Exception ignored) {}
+            }catch (Exception ignored){}
+
             params.put("ip", input.get("ip"));
 
 //            log.info("파라미터 :" + params.toString());
             String json = JsonFormatter(params);
             byte[] requestBody = json.toString().getBytes("UTF-8");
-
+            log.info("데이터 요청 전");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            HttpConnectionUtils.setDefaultSettings(conn);
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Accept", "application/json");
-            conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setDoOutput(true);
-            try {
-                conn.getOutputStream().write(requestBody);
-            } catch (Exception e) {
-                return;
-            }
-            BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
 
+            try {
+                log.info("데이터 쓰기 중");
+                conn.getOutputStream().write(requestBody);
+            } catch (Exception ignored) {}
+            log.info("데이터 요청 종료");
+//            BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
         } catch (Exception e) {
             log.error("TAG ERROR MESSAGE : {}", e.getMessage());
             e.printStackTrace();
@@ -81,7 +86,6 @@ public class ReqService {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-
             json.put(key, value);
         }
         return json.toJSONString();

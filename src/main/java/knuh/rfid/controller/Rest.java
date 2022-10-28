@@ -24,7 +24,7 @@ public class Rest {
 
     @Value("${mode:default}")
     String mode;
-    @Value("${ip:}")
+    @Value("${ip:localhost}")
     String ip;
 
     @Value("${batUrl:}")

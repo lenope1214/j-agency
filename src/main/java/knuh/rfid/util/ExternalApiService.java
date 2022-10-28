@@ -26,7 +26,7 @@ public interface ExternalApiService {
         int responseCode = 400;
         logger.info("요청 url : " + apiUrl);
         HttpURLConnection con = connect(apiUrl.trim());
-
+        HttpConnectionUtils.setDefaultSettings(con);
 //        String redirect = con.getHeaderField("Location"); // https://m-call.kro.kr 로 요청할땐 필요했는데.. 이렇게 하면 SSL 오류가 발생.
 //        con = getLocationHttpCon(con, redirect);
         String s = null;
