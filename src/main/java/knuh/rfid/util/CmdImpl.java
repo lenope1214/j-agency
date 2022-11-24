@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 public class CmdImpl implements CmdInterface{
 
     // 크롬 배치파일이 없다면 기본으로 chrome을 실행한다.
-    @Value("${batUrl:start chrome.exe}")
+    @Value("${batUrl:start /b C://Jsolution/jclient/waitViewer.bat}")
     String batUrl;
 
     public String chromeReboot() {
-        if (killChrome()) return runBat() ? "success reboot" : "failed to open chrome";
+        if (killChrome()) return runBat() ? "success chrome reboot" : "failed to open chrome";
         return "failed to kill chrome";
     }
 

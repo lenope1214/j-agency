@@ -1,22 +1,15 @@
 package knuh.rfid.controller;
 
 import knuh.rfid.util.CmdImpl;
-import knuh.rfid.util.ExtApi;
-import knuh.rfid.util.Storage;
 import knuh.rfid.util.VersionManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URL;
 
 @RestController
 @Slf4j
@@ -29,6 +22,9 @@ public class Rest {
 
     @Value("${batUrl:}")
     String batUrl;
+
+    @Value("${ext.appVersion:}")
+    private String appVersion;
 
 
     @Autowired
@@ -45,6 +41,12 @@ public class Rest {
 //        String str = rfid.decodeHexToString(hex);
 //        return new ResponseEntity<>(str, HttpStatus.OK);
 //    }
+
+    @GetMapping("/version")
+    @ResponseStatus(HttpStatus.OK)
+    public String appVersion(){
+        return appVersion;
+    }
 
     @GetMapping(value = "/poweroff")
     public void poweroff() {
@@ -73,10 +75,10 @@ public class Rest {
     @GetMapping("/chrome/reboot")
     public ResponseEntity<?> chromeReboot() {
         log.info("chrome reboot!");
-        if (ip != null && batUrl != null) {
+        if (ip != null && !ip.isEmpty()) {
             return new ResponseEntity<>(cmd.chromeReboot(), HttpStatus.OK);
         } else {
-            return new ResponseEntity("ip와 batUrl이 지정되어있지 않습니다.", HttpStatus.OK);
+            return new ResponseEntity<>("ip와 batUrl이 지정되어있지 않습니다.", HttpStatus.OK);
         }
     }
 

@@ -27,6 +27,12 @@ public class ReqService {
     @Value("${api.url.health.tag}")
     private String healthTagUrl;
 
+    @Value("${debug:false}")
+    String debug;
+    private boolean isDebug(){
+        return this.debug.equals("true");
+    }
+
     public ReqService(@Autowired ExtApi extApi){
         this.extApi = extApi;
 
@@ -38,7 +44,7 @@ public class ReqService {
             String target = input.get("target").toString();
 
             target = extApi.containHttpProtocol(target);
-            log.info("healthTagUrl : {}", healthTagUrl);
+            if(isDebug())log.info("healthTagUrl : {}", healthTagUrl);
             if(healthTagUrl == null || healthTagUrl.isEmpty()){
                 healthTagUrl = DEFAULT_HEALTH_TARGET_URL;
             }
@@ -63,18 +69,20 @@ public class ReqService {
 //            log.info("파라미터 :" + params.toString());
             String json = JsonFormatter(params);
             byte[] requestBody = json.toString().getBytes("UTF-8");
-            log.info("데이터 요청 전");
+            if(isDebug())log.info("데이터 요청 전");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             HttpConnectionUtils.setDefaultSettings(conn);
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
 
             try {
-                log.info("데이터 쓰기 중");
+                if(isDebug())log.info("데이터 쓰기 중");
                 conn.getOutputStream().write(requestBody);
             } catch (Exception ignored) {}
-            log.info("데이터 요청 종료");
-//            BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
+            if(isDebug())log.info("데이터 요청 종료");
+
+            // 주의))) input stream 주석처리하면 데이터 통신이 진행되지 않음.
+            BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
         } catch (Exception e) {
             log.error("TAG ERROR MESSAGE : {}", e.getMessage());
             e.printStackTrace();

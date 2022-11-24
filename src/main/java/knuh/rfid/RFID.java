@@ -1,9 +1,15 @@
 package knuh.rfid;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import jaco.mp3.player.MP3Player;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
@@ -11,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import knuh.rfid.util.ReqService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,9 +56,11 @@ public class RFID implements Runnable{
                     if(isDebug())log.info("읽기 시작");
                     String read = Reader();
 
-                    log.info("읽은 데이터 : {}", read);
                     if(read != null && read.length()>0 && read.split(" ").length == 3){
+                        log.info("읽은 데이터 : {}", read);
                         this.GoodBeep();
+
+
 
                         param.put("data", read);
 
@@ -76,26 +87,26 @@ public class RFID implements Runnable{
     }
 
 
-    public String ReadUIDAuto() {
-        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
-        String protocol = "44002020202020202020202020202020202053";
-        String sendProtocol = new String(protocol);
-        return read(sendProtocol);
-    }
-
-    public String ReadUID15() {
-        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
-        String protocol = "44022020202020202020202020202020202053";
-        String sendProtocol = new String(protocol);
-        return read(sendProtocol);
-    }
-
-    public String ReadUIDmi() {
-        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
-        String protocol = "44012020202020202020202020202020202053";
-        String sendProtocol = new String(protocol);
-        return read(sendProtocol);
-    }
+//    public String ReadUIDAuto() {
+//        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+//        String protocol = "44002020202020202020202020202020202053";
+//        String sendProtocol = new String(protocol);
+//        return read(sendProtocol);
+//    }
+//
+//    public String ReadUID15() {
+//        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+//        String protocol = "44022020202020202020202020202020202053";
+//        String sendProtocol = new String(protocol);
+//        return read(sendProtocol);
+//    }
+//
+//    public String ReadUIDmi() {
+//        // 44 -> D UID 구해오는 key, 00= auto  01 : mifare  02 : 15693-icode
+//        String protocol = "44012020202020202020202020202020202053";
+//        String sendProtocol = new String(protocol);
+//        return read(sendProtocol);
+//    }
 
     public String Reader() {
         // 52가 Read 하겠다는 뜻
@@ -152,15 +163,44 @@ public class RFID implements Runnable{
         }
     }
 
+    public static File convertInputStreamToFile(InputStream inputStream) throws IOException {
+        File tempFile = File.createTempFile(String.valueOf(inputStream.hashCode()), ".tmp");
+        // jvm 종료 시 같이 지워지도록
+        tempFile.deleteOnExit();
+
+        copyInputStreamToFile(inputStream, tempFile);
+
+        return tempFile;
+    }
+
     public void GoodBeep() {
-        RFIDLibrary rfid = RFIDLibrary.INSTANCE;
-        String sendProtocol = new String("43012020202020202020202020202020202042");
-        byte[] output = new byte[39];
-        try{
-            rfid.ccr_data_transceive_ex(sendProtocol, output);
-            System.out.println("GOOD Beep");
-        }catch(Exception e){
-            System.out.println("error : " + e);
+        //기존에는 rfid reader 기기 내에 있는 비프음이 들리게 했다.
+        // 그러나 비프음이 너무 작아 불편하다는 의견이 있어서 주석처리함.
+
+//        RFIDLibrary rfid = RFIDLibrary.INSTANCE;
+//        String sendProtocol = new String("43012020202020202020202020202020202042");
+//        byte[] output = new byte[39];
+//        try{
+//            rfid.ccr_data_transceive_ex(sendProtocol, output);
+//            System.out.println("GOOD Beep");
+//        }catch(Exception e){
+//            System.out.println("error : " + e);
+//        }
+
+
+
+        // jaco mp3 player 를 이용한 비프음
+        try {
+            InputStream inputStream = new ClassPathResource("beep.mp3").getInputStream();
+            File file = convertInputStreamToFile(inputStream);
+            MP3Player mp3Player = new MP3Player(file);
+            mp3Player.play();
+
+            while (!mp3Player.isStopped()) {
+                Thread.sleep(5000);
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 

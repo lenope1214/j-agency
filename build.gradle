@@ -41,6 +41,8 @@ dependencies {
 
 	// rfid 인식용 파일
 	implementation files('/CCR_32.dll')
+	// 사운드 출력용 lib
+	implementation files('libs/jaco-mp3-player-0.9.3.jar')
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
