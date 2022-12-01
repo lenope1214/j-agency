@@ -163,7 +163,7 @@ public class RFID implements Runnable{
         }
     }
 
-    public static File convertInputStreamToFile(InputStream inputStream) throws IOException {
+    public File convertInputStreamToFile(InputStream inputStream) throws IOException {
         File tempFile = File.createTempFile(String.valueOf(inputStream.hashCode()), ".tmp");
         // jvm 종료 시 같이 지워지도록
         tempFile.deleteOnExit();
@@ -196,9 +196,12 @@ public class RFID implements Runnable{
             MP3Player mp3Player = new MP3Player(file);
             mp3Player.play();
 
+            // 아래 실행 확인이 없으면 소리가 나지 않는다.
+            // 필수 처리############################################
             while (!mp3Player.isStopped()) {
-                Thread.sleep(5000);
+                Thread.sleep(10);
             }
+            // 필수 처리############################################
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }

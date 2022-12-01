@@ -9,11 +9,25 @@ import java.io.*;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
+
 import jaco.mp3.player.MP3Player;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+
 public class JavaBeepTest {
+
+    public File convertInputStreamToFile(InputStream inputStream) throws IOException {
+        File tempFile = File.createTempFile(String.valueOf(inputStream.hashCode()), ".tmp");
+        // jvm 종료 시 같이 지워지도록
+        tempFile.deleteOnExit();
+
+        copyInputStreamToFile(inputStream, tempFile);
+
+        return tempFile;
+    }
 
     @Test
     public void 자바비프음테스트() {
@@ -21,10 +35,21 @@ public class JavaBeepTest {
         for (int i = 0; i < 5; i++) {
 //            toolkit.beep();
             try {
-                playSound("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3");
-                System.out.println("삡");
+//                playSound("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3");
+//                System.out.println("삡");
+//
+//                Thread.sleep(1000);
 
-                Thread.sleep(1000);
+//                InputStream inputStream = new ClassPathResource("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3").getInputStream();
+//                InputStream inputStream = new InputStream("beep.mp3");
+//                File file = convertInputStreamToFile(inputStream);
+                File file = new File("/Users/iseongbog/workspace/Github/JClient/src/main/resources/beep.mp3");
+                MP3Player mp3Player = new MP3Player(file);
+                mp3Player.play();
+
+                while (!mp3Player.isStopped()) {
+                    Thread.sleep(100);
+                }
             } catch (Exception e) {
                 System.out.println("e = " + e);
             }
@@ -32,7 +57,7 @@ public class JavaBeepTest {
     }
 
     @Test
-    public void JACO사운드테스트(){
+    public void JACO사운드테스트() {
 
     }
 
