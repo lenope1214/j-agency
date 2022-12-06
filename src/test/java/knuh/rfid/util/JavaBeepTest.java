@@ -14,6 +14,7 @@ import jaco.mp3.player.MP3Player;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.time.LocalDateTime;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
@@ -29,37 +30,37 @@ public class JavaBeepTest {
         return tempFile;
     }
 
-    @Test
-    public void 자바비프음테스트() {
-//        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        for (int i = 0; i < 5; i++) {
-//            toolkit.beep();
-            try {
-//                playSound("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3");
-//                System.out.println("삡");
+//    @Test
+//    public void 자바비프음테스트() {
+////        Toolkit toolkit = Toolkit.getDefaultToolkit();
+//        for (int i = 0; i < 5; i++) {
+////            toolkit.beep();
+//            try {
+////                playSound("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3");
+////                System.out.println("삡");
+////
+////                Thread.sleep(1000);
 //
-//                Thread.sleep(1000);
+////                InputStream inputStream = new ClassPathResource("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3").getInputStream();
+////                InputStream inputStream = new InputStream("beep.mp3");
+////                File file = convertInputStreamToFile(inputStream);
+//                File file = new File("/Users/iseongbog/workspace/Github/JClient/src/main/resources/beep.mp3");
+//                MP3Player mp3Player = new MP3Player(file);
+//                mp3Player.play();
+//
+//                while (!mp3Player.isStopped()) {
+//                    Thread.sleep(100);
+//                }
+//            } catch (Exception e) {
+//                System.out.println("e = " + e);
+//            }
+//        }
+//    }
 
-//                InputStream inputStream = new ClassPathResource("/Users/iseongbog/workspace/Github/JClient/src/test/resources/beep.mp3").getInputStream();
-//                InputStream inputStream = new InputStream("beep.mp3");
-//                File file = convertInputStreamToFile(inputStream);
-                File file = new File("/Users/iseongbog/workspace/Github/JClient/src/main/resources/beep.mp3");
-                MP3Player mp3Player = new MP3Player(file);
-                mp3Player.play();
-
-                while (!mp3Player.isStopped()) {
-                    Thread.sleep(100);
-                }
-            } catch (Exception e) {
-                System.out.println("e = " + e);
-            }
-        }
-    }
-
-    @Test
-    public void JACO사운드테스트() {
-
-    }
+//    @Test
+//    public void JACO사운드테스트() {
+//
+//    }
 
     public void playSound(String fileName) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         try {
@@ -80,5 +81,28 @@ public class JavaBeepTest {
         }
     }
 
+    @Test
+    public void 자바비프음시간테스트(){
+        try {
+            System.out.println("beep start time : " + LocalDateTime.now());
+            InputStream inputStream = new ClassPathResource("beep.mp3").getInputStream();
+            File file = convertInputStreamToFile(inputStream);
+            MP3Player mp3Player = new MP3Player(file);
+            mp3Player.play();
+
+            // 아래 실행 확인이 없으면 소리가 나지 않는다.
+            // 필수 처리############################################
+            while (!mp3Player.isStopped()) {
+                Thread.sleep(10);
+            }
+            // 필수 처리############################################
+            System.out.println("beep end time : " + LocalDateTime.now());
+
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        assert (true);
+    }
 
 }

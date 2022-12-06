@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jaco.mp3.player.MP3Player;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +28,7 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class RFID implements Runnable{
+public class RFID implements Runnable {
     // private final ApplicationArguments appArgs;
     private HashMap<String, Object> param;
 
@@ -33,11 +36,12 @@ public class RFID implements Runnable{
 
     @Value("${debug:false}")
     String debug;
-    private boolean isDebug(){
+
+    private boolean isDebug() {
         return this.debug.equals("true");
     }
 
-    public void init(HashMap<String, Object> args){
+    public void init(HashMap<String, Object> args) {
         this.param = args;
     }
 
@@ -45,29 +49,31 @@ public class RFID implements Runnable{
     @Override
     public void run() {
         log.info("Starting main!! ");
-        
-		// 클래스 생성 초기화하
-		RFIDLibrary r = RFIDLibrary.INSTANCE;
 
-        while(true) {
-		    // 리더기가 연결되어 있는지
-            if(r.ccr_device_find()){
+        // 클래스 생성 초기화하
+        RFIDLibrary r = RFIDLibrary.INSTANCE;
+
+        while (true) {
+            // 리더기가 연결되어 있는지
+            if (r.ccr_device_find()) {
                 try {
-                    if(isDebug())log.info("읽기 시작");
+                    if (isDebug()) log.info("읽기 시작");
                     String read = Reader();
 
-                    if(read != null && read.length()>0 && read.split(" ").length == 3){
+                    if (read != null && read.length() > 0 && read.split(" ").length == 3) {
                         log.info("읽은 데이터 : {}", read);
-                        this.GoodBeep();
 
-
+                        // 비동기 처리를 위해 쓰레드 풀 사용
+                        ExecutorService executorService = Executors.newCachedThreadPool();
+                        // GoodBeep 비동기 처리
+                        executorService.submit(this::GoodBeep);
 
                         param.put("data", read);
 
 //                        if(send == null){
 //                            send = new ReqService();
 //                        }
-                        if(isDebug())log.info("읽은 데이터 전송 시작");
+                        if (isDebug()) log.info("읽은 데이터 전송 시작");
                         send.tag(param);
 
                     }
@@ -75,13 +81,13 @@ public class RFID implements Runnable{
                     e.printStackTrace();
                     log.error(e.getMessage());
                 }
-            }else{
+            } else {
                 log.error("RFID READER DEVICE IS NOT CONNECTED!");
             }
-            try{
+            try {
                 Thread.sleep(500);
-            }catch(Exception e){
-                log.error("RFID.JAVA - SLEEP ERROR - MESSAGE : {}",e.getMessage());
+            } catch (Exception e) {
+                log.error("RFID.JAVA - SLEEP ERROR - MESSAGE : {}", e.getMessage());
             }
         }
     }
@@ -122,7 +128,7 @@ public class RFID implements Runnable{
 //        log.info("read 01");
         String r01 = read(sendProtocol);
 //        log.info("res 01 : {}", result);
-        if(r01 != null){
+        if (r01 != null) {
             result += r01;
         }
 
@@ -130,7 +136,7 @@ public class RFID implements Runnable{
 //        log.info("read 02");
         String r02 = read(sendProtocol);
 //        log.info("res 02 : {}", r02);
-        if(r02 != null) {
+        if (r02 != null) {
             result += r02;
         }
 //        log.info("result : {}", result);
@@ -141,22 +147,22 @@ public class RFID implements Runnable{
         return result;
     }
 
-    private String read(String protocol){
+    private String read(String protocol) {
         RFIDLibrary rfid = RFIDLibrary.INSTANCE;
         // 52가 Read 하겠다는 뜻
         // 5201 -> Read 01 섹터
         // 섹터는 01~04섹터로 구성되어 있음
         String sendProtocol = new String(protocol);
         byte[] output = new byte[39];
-        try{
+        try {
             rfid.ccr_data_transceive_ex(sendProtocol, output);
             String receiveProtocol = new String(output);
             // return new String(bytes, StandardCharsets.US_ASCII);
             // 실패 프토토콜 플래그
-            if(receiveProtocol.substring(0, 2).equals("45"))
+            if (receiveProtocol.substring(0, 2).equals("45"))
                 return "";
             return decodeHexToString(new String(output));
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("error : " + e);
             this.BadBeep();
             return "";
@@ -188,9 +194,9 @@ public class RFID implements Runnable{
 //        }
 
 
-
         // jaco mp3 player 를 이용한 비프음
         try {
+            log.info("beep start time : {}", LocalDateTime.now());
             InputStream inputStream = new ClassPathResource("beep.mp3").getInputStream();
             File file = convertInputStreamToFile(inputStream);
             MP3Player mp3Player = new MP3Player(file);
@@ -202,6 +208,8 @@ public class RFID implements Runnable{
                 Thread.sleep(10);
             }
             // 필수 처리############################################
+            log.info("beep end time : {}", LocalDateTime.now());
+
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -211,25 +219,25 @@ public class RFID implements Runnable{
         RFIDLibrary rfid = RFIDLibrary.INSTANCE;
         String sendProtocol = new String("43022020202020202020202020202020202041");
         byte[] output = new byte[39];
-        try{
+        try {
             rfid.ccr_data_transceive_ex(sendProtocol, output);
             System.out.println("BAD Beep");
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("error : " + e);
         }
     }
 
-    public String byteArrayToHexString(byte[] bytes){
+    public String byteArrayToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
 
-        for(byte b : bytes){
-            sb.append(String.format("%02X", b&0xff));
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b & 0xff));
         }
 
         return sb.toString();
     }
 
-    public String decodeHexToString(String hexString){
+    public String decodeHexToString(String hexString) {
 
         try {
             StringBuilder sb = new StringBuilder();
@@ -239,18 +247,18 @@ public class RFID implements Runnable{
 
             // 0~3번튼 태그 결과 확인용
             // 4번부터 가져오는게 맞다.
-            for(int i = 4 ; i < 32 && i<chars.length ; i++){
+            for (int i = 4; i < 32 && i < chars.length; i++) {
                 sb.append(chars[i]);
             }
             //                log.info("sb : {}", sb);
-            byte[] bytes  = Hex.decodeHex(sb.toString().toCharArray());
+            byte[] bytes = Hex.decodeHex(sb.toString().toCharArray());
             //                log.info("bytes : {}", bytes);
             //                log.info("decodeHexToString result : {}", result);
             return new String(bytes, "euc-kr");
         } catch (Exception e) {
-           log.error(e.getMessage());
-           e.printStackTrace();
-           return null;
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 }
