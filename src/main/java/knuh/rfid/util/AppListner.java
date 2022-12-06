@@ -102,8 +102,9 @@ public class AppListner implements CommandLineRunner {
             }
         }
 
-        if (mode != null && mode.equals("rfid")) {
+        if (mode != null && (mode.equals("rfid") || mode.equals("rfidInside"))){
             HashMap<String, Object> params = new HashMap<>();
+            params.put("mode", mode);
             params.put("ip", ip);
             params.put("target", target);
             rfid.init(params);

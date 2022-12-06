@@ -180,38 +180,42 @@ public class RFID implements Runnable {
     }
 
     public void GoodBeep() {
+        String modeFlag = "";
+
+        modeFlag = (String) param.get("mode");
+        
         //기존에는 rfid reader 기기 내에 있는 비프음이 들리게 했다.
-        // 그러나 비프음이 너무 작아 불편하다는 의견이 있어서 주석처리함.
+        // 그러나 비프음이 너무 작아 mode 값에 따라 기존 비프음, 신규 비프음 선택 할 수 있게 바꾸었다.
+        if (modeFlag.equals("rfidInside")) {
+            RFIDLibrary rfid = RFIDLibrary.INSTANCE;
+            String sendProtocol = new String("43012020202020202020202020202020202042");
+            byte[] output = new byte[39];
+            try{
+                rfid.ccr_data_transceive_ex(sendProtocol, output);
+                System.out.println("GOOD Beep");
+            }catch(Exception e){
+                System.out.println("error : " + e);
+            }    
+        } else {
+            // jaco mp3 player 를 이용한 비프음
+            try {
+                log.info("beep start time : {}", LocalDateTime.now());
+                InputStream inputStream = new ClassPathResource("beep.mp3").getInputStream();
+                File file = convertInputStreamToFile(inputStream);
+                MP3Player mp3Player = new MP3Player(file);
+                mp3Player.play();
 
-//        RFIDLibrary rfid = RFIDLibrary.INSTANCE;
-//        String sendProtocol = new String("43012020202020202020202020202020202042");
-//        byte[] output = new byte[39];
-//        try{
-//            rfid.ccr_data_transceive_ex(sendProtocol, output);
-//            System.out.println("GOOD Beep");
-//        }catch(Exception e){
-//            System.out.println("error : " + e);
-//        }
+                // 아래 실행 확인이 없으면 소리가 나지 않는다.
+                // 필수 처리############################################
+                while (!mp3Player.isStopped()) {
+                    Thread.sleep(10);
+                }
+                // 필수 처리############################################
+                log.info("beep end time : {}", LocalDateTime.now());
 
-
-        // jaco mp3 player 를 이용한 비프음
-        try {
-            log.info("beep start time : {}", LocalDateTime.now());
-            InputStream inputStream = new ClassPathResource("beep.mp3").getInputStream();
-            File file = convertInputStreamToFile(inputStream);
-            MP3Player mp3Player = new MP3Player(file);
-            mp3Player.play();
-
-            // 아래 실행 확인이 없으면 소리가 나지 않는다.
-            // 필수 처리############################################
-            while (!mp3Player.isStopped()) {
-                Thread.sleep(10);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
-            // 필수 처리############################################
-            log.info("beep end time : {}", LocalDateTime.now());
-
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
         }
     }
 
