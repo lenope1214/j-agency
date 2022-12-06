@@ -76,6 +76,12 @@ public class RFID implements Runnable {
                         if (isDebug()) log.info("읽은 데이터 전송 시작");
                         send.tag(param);
 
+                        // 정상 태깅 했을 때 여러번 찍히는 것 방지용
+                        try {
+                            Thread.sleep(2000);
+                        } catch (Exception e) {
+                            log.error("AFTER SEND - SLEEP ERROR - MESSAGE : {}", e.getMessage());
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
