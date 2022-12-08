@@ -42,10 +42,19 @@ public class Rest {
 //        return new ResponseEntity<>(str, HttpStatus.OK);
 //    }
 
-    @GetMapping("/turnon/{ip}")
+    @GetMapping("/turnon/{ip}/{mac}")
     @ResponseStatus(HttpStatus.OK)
-    public Boolean turnOnByIp(@PathVariable String ip){
-        return cmd.turnOnByIp(ip);
+    public Boolean turnOnByIpAndMac(
+            @PathVariable String ip,
+            @PathVariable String mac
+    ){
+        return cmd.turnOn(ip, mac);
+    }
+
+    @GetMapping("/turnon/{mac}")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean turnOnByMac(@PathVariable String mac){
+        return cmd.turnOnByMac(mac);
     }
 
     @GetMapping("/version")

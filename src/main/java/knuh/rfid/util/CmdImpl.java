@@ -29,10 +29,10 @@ public class CmdImpl implements CmdInterface {
         return false;
     }
 
-    public Boolean turnOnByIp(String ip) {
+    public Boolean turnOnByMac(String mac) {
         try {
-            log.info("turnOnByIp ip : {}", ip);
-            return turnOn(ip, "255.255.255.255");
+            log.info("turnOnByIp mac : {}", mac);
+            return turnOn("255.255.255.255", mac);
         } catch (Exception e) {
             log.error("error message : {}", e.getMessage());
             e.printStackTrace();
@@ -41,18 +41,17 @@ public class CmdImpl implements CmdInterface {
     }
 
 
-    public Boolean turnOn(String ip, String mac) throws Exception {
+    public Boolean turnOn(String ip, String mac){
         final int PORT = 9; // wol 기본 포트
 
         // ip는 broadcast ip로 하는게 좋다.
         // ex) ip가 192.168.0.245 > 192.168.0.255 이때 서브넷 마스크에 따라 broad cast ip는 변경될 수 있음.
-        String ipStr = ip;
-        String macStr = mac;
-        log.info("turnOn - ipStr : {}", ipStr);
-        log.info("turnOn - macStr : {}", macStr);
+
+        log.info("turnOn - ipStr : {}", ip);
+        log.info("turnOn - macStr : {}", mac);
 
         try {
-            byte[] macBytes = getMacBytes(macStr);
+            byte[] macBytes = getMacBytes(mac);
             byte[] bytes = new byte[6 + 16 * macBytes.length];
             for (int i = 0; i < 6; i++) {
                 bytes[i] = (byte) 0xff;
@@ -61,7 +60,7 @@ public class CmdImpl implements CmdInterface {
                 System.arraycopy(macBytes, 0, bytes, i, macBytes.length);
             }
 
-            InetAddress address = InetAddress.getByName(ipStr);
+            InetAddress address = InetAddress.getByName(ip);
             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, address, PORT);
             DatagramSocket socket = new DatagramSocket();
             log.info("wol socket 전송중..");
