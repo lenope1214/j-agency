@@ -1,4 +1,4 @@
-package knuh.rfid.util;
+package kr.co.jsol.jagency.reader.application;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

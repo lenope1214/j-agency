@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8080}
+  tomcat:
+    remoteip:
+      protocol-header: x-forwarded-proto
+  allowed-origins:
+    - http://localhost:3000 # 프론트엔드 개발용
+    - http://localhost:5173 # 프론트엔드 개발용
+    - https://healthcare.staging.j-sol.co.kr # 배포 테스트 서비스
+    - https://healthcare.j-sol.co.kr # 배포 운영 서비스
+
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:100MB}
+      max-request-size: ${MAX_REQUEST_SIZE:100MB}
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+    operations-sorter: method # method: HttpMethod 순으로 정렬, alpha: 알파벳 순으로 정렬
+    syntax-highlight:
+      activated: true
+    tags-sorter: alpha # 태그 알파벳 순으로 정렬
+    doc-expansion: none
+    persist-authorization: true
+    display-request-duration: true
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      exposure:
+        exclude: env, beans, redis
+        include: health, prometheus
+      base-path: /actuator
+    jmx:
+      exposure:
+        exclude: "*"
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+    prometheus:
+      enabled: true
+  health:
+    redis:
+      enabled: false
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      maximum-expected-value:
+        http.server.requests: 1s

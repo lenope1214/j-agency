@@ -1,0 +1,57 @@
+server:
+  port: ${PORT:8080}
+  tomcat:
+    remoteip:
+      protocol-header: x-forwarded-proto
+
+spring:
+  datasource:
+    # encrypt=false 를 사용하여 SSL 환경 외에서도 테스트할 수 있도록 함.
+    url: jdbc:sqlserver://localhost:1433;database=jsolhealthcare;schema=jsolhealthcare;encrypt=true;trustServerCertificate=true;
+    username: sa
+    password: jsolution@)@$12
+  jpa:
+    open-in-view: ${JPA_OPEN_IN_VIEW:false}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        # to use custom function
+        dialect: kr.co.jsol.hcpf.common.infrastructure.database.hibernate.Mssql2016FunctionsDialect
+        format_sql: true
+        default_batch_fetch_size: 1000
+        highlight_sql: true
+  file:
+    mode: ${FILE_MODE:local}
+    # mode : local
+    dir: ${FILE_DIR:}
+    # mode : minio
+    minio-url: ${MINIO_URL:}
+    minio-bucket: ${MINIO_BUCKET:}
+    minio-access-key: ${MINIO_ACCESS_KEY:}
+    minio-secret-key: ${MINIO_SECRET_KEY:}
+
+jwt:
+  access-secret-key: ${JWT_SECRET:l8PsAb4rc2rSKI29YS-GOxDflMXEP3tGFZr4uBEtsS0tpuo26eOgxUVeyhpASMANlEQvCKH-W1jMNNPxPYlBpfJNvMYpgKI8RD8C1w5-TWYIMh2PV5GWluVF}
+  refresh-secret-key: ${JWT_REFRESH_SECRET:gv&kB5AgkDcFTq7TmHXpZ7%4bLqXg0V6ExDxcxaHRUIcW-bFLecE9nGi2cpCrv04OGTbdCgVvmPgwaL9!RyvKcWtg7JQWbcdEgtPOirPiGvm!YXlFRIvuVX_}
+  # ms단위 값 입력 ex) 1000 => 1초
+  ## 30일
+  access-expiration: ${JWT_ACCESS_EXPIRATION:2592000000}
+  ## 365일
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:31536000000}
+  
+logging:
+  level:
+    org:
+      springframework:
+        data: ${LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA:INFO}
+      hibernate:
+        jdbc:
+        type:
+          descriptor:
+            sql: ${LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL:INFO} # 기본은 사용안함
+
+table:
+  schema:
+    default: jsolhealthcare

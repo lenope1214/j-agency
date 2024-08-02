@@ -1,6 +1,6 @@
-package knuh.rfid.util;
+package kr.co.jsol.jagency.reader.application;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +8,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
-@Slf4j
 @Component
 public class CmdImpl implements CmdInterface {
+    private final Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+    //TODO 배치파일 경로는 서버에서 받아오도록 수정,
     // 크롬 배치파일이 없다면 기본으로 chrome을 실행한다.
     @Value("${batUrl:start /b C://Jsolution/jclient/waitViewer.bat}")
     String batUrl;
