@@ -1,13 +1,10 @@
-package kr.co.jsol.acr122.application.runner;
+package kr.co.jsol.jagency.acr122.application.runner;
 
 import kr.co.jsol.jagency.reader.application.CmdImpl;
 import kr.co.jsol.jagency.reader.application.runner.TagRunner;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,9 +12,9 @@ public class Acr122Runner implements TagRunner {
 
     private final Logger log = LoggerFactory.getLogger(Acr122Runner.class);
 
-    // : 을 붙여서 기본값을 부여함.   java jclient --mode 이런 properties를 입력 안 했을때 오류 나지 않도록 설정해준다.
-    @Value("${acr122.use:false}") // false시 RFID 사용X
-            String mode;
+    // false시 RFID 사용X
+    @Value("${acr122.use:false}")
+    String use;
 
     // application.yaml로 설정해도 되지만
     // 불특정 다수의 PC에 설치할 경우가 더 많기 때문에
@@ -50,15 +47,19 @@ public class Acr122Runner implements TagRunner {
 
     @Override
     public void init() {
+        log.info("Acr122Runner init - version {}", appVersion);
         // 서버에서 데이터를 받는다던가 초기 데이터 세팅을 한다던가 한다.
     }
 
     @Override
     public void run(String... args) throws Exception {
-        Thread thread = new Thread(acr122Reader);
-        thread.start();
+        log.info("acr122 use : {}", use);
+
+        if (use.equals("true")) {
+            Thread thread = new Thread(acr122Reader);
+            thread.start();
+        }
 //
-//        log.info("mode : {}", mode);
 //        log.info("ip : {}", ip);
 //        log.info("target : {}", target);
 //        log.info("batUrl : {}", batUrl);

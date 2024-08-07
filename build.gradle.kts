@@ -89,7 +89,7 @@ subprojects {
         // lombok
         compileOnly("org.projectlombok:lombok:${lombokVersion}")
         implementation("org.projectlombok:lombok:${lombokVersion}")
-        annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
+        annotationProcessor("org.projectlombok:lombok")
         testImplementation("org.projectlombok:lombok:${lombokVersion}")
 
         // springdoc
@@ -139,7 +139,6 @@ subprojects {
         implementation("com.google.code.gson:gson:2.8.9")
 
 
-
         // JAVA MP3 재생 라이브러리
         // https://mvnrepository.com/artifact/javazoom/jlayer
         implementation("javazoom:jlayer:1.0.1")
@@ -168,7 +167,8 @@ subprojects {
         useJUnitPlatform()
         // springmockk 설정
         jvmArgs(
-            "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+//            "--add-opens",
+            "java.base/java.lang.reflect=ALL-UNNAMED",
         )
     }
 

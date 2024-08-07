@@ -1,4 +1,4 @@
-package kr.co.jsol.acr122.application;
+package kr.co.jsol.jagency.acr122.application;
 
 import org.nfctools.utils.CardTerminalUtils;
 
@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
  * a NTAG213 with ACS ACR122 USB terminal.<br>
  * Password is MD5-hashed and the first 4 bytes are kept (compatible with NFC
  * Tools App by wakdev).
- *
  */
 public class NtagPwd {
 
@@ -28,18 +27,18 @@ public class NtagPwd {
     // 0x30 : Read cmd for NTAG21x
     public static final byte READ_CMD = (byte) 0x30;
 
-    public static final byte[] IS_AUTH_CM = { READ_CMD, AUTH0_ADD };
+    public static final byte[] IS_AUTH_CM = {READ_CMD, AUTH0_ADD};
 
-    public static final byte[] AUTH_CM = { (byte) 0x1B };
+    public static final byte[] AUTH_CM = {(byte) 0x1B};
 
-    public static final byte[] SET_CONFIG_CMD = new byte[] { WRITE_CMD, AUTH0_ADD, 4, 0, 0, 0 };
+    public static final byte[] SET_CONFIG_CMD = new byte[]{WRITE_CMD, AUTH0_ADD, 4, 0, 0, 0};
 
-    public static final byte[] SET_PWD_CMD = new byte[] { WRITE_CMD, PWD_ADD };
+    public static final byte[] SET_PWD_CMD = new byte[]{WRITE_CMD, PWD_ADD};
 
-    public static final byte[] UNSET_CONFIG_CMD = new byte[] { WRITE_CMD, AUTH0_ADD, 4, 0, 0, (byte) 0xFF };
+    public static final byte[] UNSET_CONFIG_CMD = new byte[]{WRITE_CMD, AUTH0_ADD, 4, 0, 0, (byte) 0xFF};
 
-    public static final byte[] UNSET_PWD_CMD = new byte[] { WRITE_CMD, PWD_ADD, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
-            (byte) 0xFF };
+    public static final byte[] UNSET_PWD_CMD = new byte[]{WRITE_CMD, PWD_ADD, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF,
+            (byte) 0xFF};
 
 //    /**
 //     * Main.
@@ -243,7 +242,7 @@ public class NtagPwd {
 
     public static CommandAPDU createCommand(byte[] cmd) {
         byte[] fullcmd = concatArrays(
-                new byte[] { (byte) 0xFF, 0, 0, 0, (byte) (cmd.length + 2), (byte) 0xD4, (byte) 0x42 }, cmd);
+                new byte[]{(byte) 0xFF, 0, 0, 0, (byte) (cmd.length + 2), (byte) 0xD4, (byte) 0x42}, cmd);
         return new CommandAPDU(fullcmd);
     }
 
