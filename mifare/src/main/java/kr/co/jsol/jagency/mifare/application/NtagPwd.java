@@ -1,4 +1,4 @@
-package kr.co.jsol.jagency.acr122.application;
+package kr.co.jsol.jagency.mifare.application;
 
 import org.nfctools.utils.CardTerminalUtils;
 

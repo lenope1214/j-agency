@@ -13,4 +13,8 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
+
+    // mifare 사용시 사용됨
+    api("org.nfctools:nfctools-api:1.0.M8")
+    api("org.nfctools:nfctools-core:1.0.M8")
 }

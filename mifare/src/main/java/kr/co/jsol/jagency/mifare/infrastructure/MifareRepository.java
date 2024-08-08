@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package kr.co.jsol.jagency.acr122.infrastructure;
+package kr.co.jsol.jagency.mifare.infrastructure;
 
-import kr.co.jsol.jagency.acr122.application.dto.WriteAcr122Dto;
-import kr.co.jsol.jagency.acr122.application.utils.MifareUtils;
 import kr.co.jsol.jagency.common.application.utils.HexUtils;
 import kr.co.jsol.jagency.common.infrastructure.exception.GeneralClientException;
-import org.jetbrains.annotations.NotNull;
+import kr.co.jsol.jagency.mifare.application.dto.WriteMifareDto;
+import kr.co.jsol.jagency.mifare.application.utils.MifareUtils;
+import kr.co.jsol.jagency.reader.infrastructure.Acr122Device;
 import org.nfctools.mf.MfCardListener;
 import org.nfctools.mf.card.MfCard;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static kr.co.jsol.jagency.acr122.application.RFIDTagAllocator.*;
+import static kr.co.jsol.jagency.mifare.application.RFIDTagAllocator.*;
 
 /**
  * Entry point of the program.
@@ -50,18 +50,18 @@ import static kr.co.jsol.jagency.acr122.application.RFIDTagAllocator.*;
  * Manager for an ACR122 reader/writer.
  */
 @Component
-public class Acr122Repository {
+public class MifareRepository {
 
     private boolean isReading = false;
 
-    private static final Logger log = LoggerFactory.getLogger(Acr122Repository.class);
+    private static final Logger log = LoggerFactory.getLogger(MifareRepository.class);
 
-    @Value("${acr122.debug:false}")
+    @Value("${mifare.debug:false}")
     Boolean debug;
 
     // 180302를 hex로 변환했을때 결과 313830333032 로 하려고 했으나 기존에 사용하던 태그들의 Key 값이 FFFFFFFFFFFF 라서
     // 키를 변경할 수 없었음.
-    @Value("${acr122.secret-key:FFFFFFFFFFFF}")
+    @Value("${mifare.secret-key:FFFFFFFFFFFF}")
     String secretKey;
 
     private List<String> getKeys() {
@@ -153,8 +153,7 @@ public class Acr122Repository {
     /**
      * read blocks.
      */
-    public void read() throws IOException {
-        // Card listener for dump
+    public void read(Consumer<String> callback) throws IOException {
         if (isReading) {
             return;
         }
@@ -162,7 +161,7 @@ public class Acr122Repository {
         MfCardListener listener = (mfCard, mfReaderWriter) -> {
             try {
                 isReading = true;
-                MifareUtils.dumpMifareClassic1KCard(mfReaderWriter, mfCard, keys, sendServer());
+                MifareUtils.dumpMifareClassic1KCard(mfReaderWriter, mfCard, keys, callback);
             } catch (CardException ce) {
                 throw new GeneralClientException.BadRequestException("카드 정보를 읽을 수 없습니다.");
             } finally {
@@ -174,28 +173,24 @@ public class Acr122Repository {
         listen(listener);
     }
 
-    private static @NotNull Consumer<String> sendServer() {
-        return (arg) -> {
-            log.info("서버로 데이터를 전송합니다 데이터: {}", arg);
-        };
-    }
 
     /**
      * Writes to cards.
      *
-     * @param writeAcr122Dto 쓰려는 카드의 Sector ID, Block ID, Key(Hex, 16진수), Data(Hex, 16진수) 값으로만 이루어져 있어야 한다.
+     * @param writeMifareDto 쓰려는 카드의 Sector ID, Block ID, Key(Hex, 16진수), Data(Hex, 16진수) 값으로만 이루어져 있어야 한다.
      */
-    public void writeToCards(WriteAcr122Dto writeAcr122Dto) throws IOException {
+    public void writeToCards(WriteMifareDto writeMifareDto) throws IOException {
         List<String> keys = getKeys();
         if (debug) {
-            log.info("writeAcr122Dto = {}", writeAcr122Dto);
+            log.info("writeAcr122Dto = {}", writeMifareDto);
             log.info("secretKey = {}", secretKey);
             log.info("keys = {}", keys);
 //            log.info("endOfFile = {}", endOfFile);
         }
-        // setter는 잘 되는지 테스트
-        final String inputData = writeAcr122Dto.getData();
-        final String hexString = HexUtils.stringToHex(inputData);
+        final String inputData = writeMifareDto.getData();
+
+        // 입력 종료 플래그(00) 추가, 추가하지 않으면 Block에 딱 맞게 입력된 경우 다음 블럭에 값이 있을 경우 이전에 입력한 값도 읽게 됨
+        final String hexString = HexUtils.stringToHex(inputData) + "00";
 //        final String hexString = HexUtils.stringToHex(inputData) + endOfFile; // 마지막 블록에는 EOF(Null)를 넣어준다.
 
         if (debug) {

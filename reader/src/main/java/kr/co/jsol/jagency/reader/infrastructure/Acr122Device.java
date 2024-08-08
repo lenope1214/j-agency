@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package kr.co.jsol.jagency.acr122.infrastructure;
+package kr.co.jsol.jagency.reader.infrastructure;
 
 import org.nfctools.mf.MfCardListener;
 import org.nfctools.spi.acs.Acr122ReaderWriter;

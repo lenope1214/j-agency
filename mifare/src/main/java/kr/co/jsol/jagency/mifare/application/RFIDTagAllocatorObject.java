@@ -1,4 +1,4 @@
-package kr.co.jsol.jagency.acr122.application;
+package kr.co.jsol.jagency.mifare.application;
 
 import kr.co.jsol.jagency.common.application.utils.HexUtils;
 import kr.co.jsol.jagency.common.infrastructure.exception.GeneralClientException;

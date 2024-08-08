@@ -1,7 +1,12 @@
-acr122:
-  use: false
-  app:
-    version: 0.0.1 # 앱 버전, 서버에 저장된 최신 버전 다운로드시 사용한다.
-    downloadUrl: http://192.168.0.36:8081/api/open/download/acr122 # 앱 다운로드 URL
+mifare:
+  use: true # true: acr122 사용, false: acr122 사용 안함
+
   secret-key: FFFFFFFFFFFF
   debug: true
+  tag:
+    url: http://192.168.0.48:18010/api/v1/room-waitings/tag
+
+app:
+  version: 0.0.1 # 앱 버전, 서버에 저장된 최신 버전 다운로드시 사용한다.
+  downloadUrl: http://192.168.0.36:8081/api/open/download/acr122 # 앱 다운로드 URL
+  roomId: 1

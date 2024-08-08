@@ -1,6 +1,6 @@
-package kr.co.jsol.jagency.acr122.application.runner;
+package kr.co.jsol.jagency.mifare.application.runner;
 
-import kr.co.jsol.jagency.acr122.infrastructure.Acr122Repository;
+import kr.co.jsol.jagency.mifare.application.MifareTagServiceImpl;
 import kr.co.jsol.jagency.reader.application.runner.Readable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,18 +10,18 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 
 @Component
-public class Acr122Reader implements Readable {
+public class MifareReader implements Readable {
 
-    private final Logger log = LoggerFactory.getLogger(Acr122Reader.class);
-    private final Acr122Repository acr122Repository;
+    private final Logger log = LoggerFactory.getLogger(MifareReader.class);
+    private final MifareTagServiceImpl mifareTagService;
 
-    @Value("${acr122.debug:false}")
+    @Value("${mifare.debug:false}")
     Boolean debug;
 
     private HashMap<String, Object> requestBody;
 
-    public Acr122Reader(Acr122Repository acr122Repository) {
-        this.acr122Repository = acr122Repository;
+    public MifareReader(MifareTagServiceImpl mifareTagService) {
+        this.mifareTagService = mifareTagService;
     }
 
     public void init(HashMap<String, Object> args) {
@@ -32,11 +32,14 @@ public class Acr122Reader implements Readable {
     public void run() {
         log.info("Starting Acr122Reader ");
 
+//        TODO tag test 테스트 후 제거
+//        mifareRepository.sendServer().accept("test");
+
         while (true) {
             try {
-                if (acr122Repository.isConnected()) {
+                if (mifareTagService.isConnected()) {
                     log.info("Connected to ACR122");
-                    acr122Repository.read();
+                    mifareTagService.read();
                 }
             } catch (Exception e) {
                 log.error("Error while reading card: {}", e.getMessage());

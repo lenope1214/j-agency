@@ -5,12 +5,16 @@ import org.springframework.http.HttpStatus;
 public abstract class GeneralServerException {
 
     public static class InternalServerException extends CustomException {
-        public InternalServerException(String message, Throwable e) {
-            super("GNR-5000", message != null ? message : "서버 에러 발생, 담당 개발자에게 연락해주세요.", HttpStatus.INTERNAL_SERVER_ERROR, e);
+        public InternalServerException() {
+            this("서버 에러 발생, 담당 개발자에게 연락해주세요.");
         }
 
-        public InternalServerException() {
-            this("서버 에러 발생, 담당 개발자에게 연락해주세요.", null);
+        public InternalServerException(String message) {
+            this(message, null);
+        }
+
+        public InternalServerException(String message, Throwable e) {
+            super("GNR-5000", message != null ? message : "서버 에러 발생, 담당 개발자에게 연락해주세요.", HttpStatus.INTERNAL_SERVER_ERROR, e);
         }
     }
 

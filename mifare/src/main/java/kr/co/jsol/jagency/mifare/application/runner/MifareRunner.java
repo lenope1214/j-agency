@@ -1,4 +1,4 @@
-package kr.co.jsol.jagency.acr122.application.runner;
+package kr.co.jsol.jagency.mifare.application.runner;
 
 import kr.co.jsol.jagency.reader.application.CmdImpl;
 import kr.co.jsol.jagency.reader.application.runner.TagRunner;
@@ -8,24 +8,24 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Acr122Runner implements TagRunner {
+public class MifareRunner implements TagRunner {
 
-    private final Logger log = LoggerFactory.getLogger(Acr122Runner.class);
+    private final Logger log = LoggerFactory.getLogger(MifareRunner.class);
 
     // false시 RFID 사용X
-    @Value("${acr122.use:false}")
+    @Value("${mifare.use:false}")
     String use;
 
     // application.yaml로 설정해도 되지만
     // 불특정 다수의 PC에 설치할 경우가 더 많기 때문에
     // 서버 실행시 --acr122.rfid-reader-id=1 이런식으로 실행해 값을 설정한다.
-    @Value("${acr122.rfid-reader-id:}")
+    @Value("${mifare.rfid-reader-id:}")
     String rfidReaderId;
 
-    @Value("${acr122.app.version:}")
+    @Value("${app.version:}")
     private String appVersion;
 
-    @Value("${acr122.app.downloadUrl:}")
+    @Value("${app.downloadUrl:}")
     private String appDownloadUrl;
 
     // 아래 값들은 추후에 server에서 받아옴.
@@ -37,11 +37,11 @@ public class Acr122Runner implements TagRunner {
 //
 //    private final VersionManagerService versionManagerService;
 //
-    private final Acr122Reader acr122Reader;
+    private final MifareReader mifareReader;
     private final CmdImpl cmdService;
 
-    public Acr122Runner(Acr122Reader acr122Reader, CmdImpl cmdService) {
-        this.acr122Reader = acr122Reader;
+    public MifareRunner(MifareReader mifareReader, CmdImpl cmdService) {
+        this.mifareReader = mifareReader;
         this.cmdService = cmdService;
     }
 
@@ -56,7 +56,7 @@ public class Acr122Runner implements TagRunner {
         log.info("acr122 use : {}", use);
 
         if (use.equals("true")) {
-            Thread thread = new Thread(acr122Reader);
+            Thread thread = new Thread(mifareReader);
             thread.start();
         }
 //

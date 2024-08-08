@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package kr.co.jsol.jagency.acr122.application.utils;
+package kr.co.jsol.jagency.mifare.application.utils;
 
 import kr.co.jsol.jagency.common.application.utils.HexUtils;
 import kr.co.jsol.jagency.common.infrastructure.exception.CustomException;
@@ -119,41 +119,43 @@ public final class MifareUtils {
 
         StringBuilder sb = new StringBuilder();
         boolean breakFlag = false;
+        int endFlag = 1;
 
         for (int sectorNumber = 0; sectorNumber < MIFARE_1K_SECTOR_COUNT - 1 && !breakFlag; sectorNumber++) {
             int sectorIndex = sectorNumber + 1;
-            for (int blockIndex = 0; blockIndex < MIFARE_1K_PER_SECTOR_BLOCK_COUNT && !breakFlag; blockIndex++) {
-                // 섹터와 상관없이 0~3을 설정한다.
+            for (int blockIndex = 0; blockIndex < MIFARE_1K_PER_SECTOR_BLOCK_COUNT - 1 && !breakFlag; blockIndex++) {
+                // 섹터와 상관없이 0~2을 설정한다.
                 // 3=  trail block이어서 읽을 수 없음.
                 try {
                     String sectorRaw = dumpMifareClassic1KBlock(reader, card, sectorIndex, blockIndex, keys);
+                    log.info("sectorRaw : {}", sectorRaw);
 
+                    // 빈 블럭일 경우 결과에 아예 추가하지 않아야 한다.
                     if (sectorRaw.equals("00000000000000000000000000000000")) {
                         breakFlag = true;
-                        continue;
+                        break;
                     }
 
                     // 데이터를 추가한다.
                     sb.append(sectorRaw);
 
                     // 후처리 진행
-                    // 만약 sectorRaw를 2개씩 잘랐을때 모든 요소중 00이 존재한다면 더 이상 읽을 필요가 없다.
-                    if (!sectorRaw.isEmpty() && sectorRaw.length() % 32 == 0) {
-                        String[] split = sectorRaw.split("(?<=\\G.{32})");
-                        for (String s : split) {
-                            if (s.equals("00")) {
-                                breakFlag = true;
-                                break;
-                            }
-                        }
+                    // 만약 데이터가 존재하고 00으로 종료된다면 다음 블럭을 읽지 말아야 한다.
+                    if (sectorRaw.endsWith("00")) {
+                        endFlag = 2;
+                        breakFlag = true;
+                        break;
                     }
 
                 } catch (MifareClassic1KException.NotReadableTrailBlock ignore) {
+                    // 3번 블럭인 trailer block을 읽게됐을 경우 다음 섹터로 넘어가기 위해 continue
                     continue;
                 } catch (CustomException e) {
                     // 읽을 수 없는 태그일 경우, 종료
                     log.error(e.getMessage());
                     breakFlag = true;
+                } finally {
+                    log.info("[읽기 종료] 모든 데이터를 확인하였습니다. 읽기를 종료합니다. [{}]", endFlag);
                 }
             }
         }
@@ -342,3 +344,5 @@ public final class MifareUtils {
         throw new GeneralClientException.BadRequestException("읽을 수 없는 태그입니다.");
     }
 }
+
+
