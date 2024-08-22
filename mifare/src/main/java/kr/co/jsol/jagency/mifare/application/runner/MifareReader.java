@@ -1,6 +1,6 @@
 package kr.co.jsol.jagency.mifare.application.runner;
 
-import kr.co.jsol.jagency.mifare.application.MifareTagServiceImpl;
+import kr.co.jsol.jagency.mifare.application.MifareRestServiceImpl;
 import kr.co.jsol.jagency.reader.application.runner.Readable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +13,14 @@ import java.util.HashMap;
 public class MifareReader implements Readable {
 
     private final Logger log = LoggerFactory.getLogger(MifareReader.class);
-    private final MifareTagServiceImpl mifareTagService;
+    private final MifareRestServiceImpl mifareTagService;
 
     @Value("${mifare.debug:false}")
     Boolean debug;
 
     private HashMap<String, Object> requestBody;
 
-    public MifareReader(MifareTagServiceImpl mifareTagService) {
+    public MifareReader(MifareRestServiceImpl mifareTagService) {
         this.mifareTagService = mifareTagService;
     }
 

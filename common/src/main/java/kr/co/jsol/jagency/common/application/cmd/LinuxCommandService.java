@@ -1,21 +1,85 @@
-package kr.co.jsol.jagency.reader.application;
+package kr.co.jsol.jagency.common.application.cmd;
 
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
-@Component
-public class CmdImpl implements CmdInterface {
-    private final Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
-
-    //TODO 배치파일 경로는 서버에서 받아오도록 수정,
+// 리눅스 기반 PC에서 커맨드라인 명령어를 내리기 위한 서비스
+@Slf4j
+public class LinuxCommandService implements CmdService {
     // 크롬 배치파일이 없다면 기본으로 chrome을 실행한다.
-    @Value("${batUrl:start /b C://Jsolution/jclient/waitViewer.bat}")
-    String batUrl;
+    private String batUrl;
+
+    private String restartFileName = "restart.sh";
+
+    public LinuxCommandService(
+            String batUrl
+    ) {
+        log.info("LinuxCommandService 생성자 실행");
+        log.info("batUrl : {}", batUrl);
+        this.batUrl = batUrl;
+    }
+
+    public void restartProgram() {
+        if (restartFileName != null) {
+            runCmd("sh " + restartFileName);
+        }
+    }
+
+    public void rebootPc() {
+        runCmd("shutdown -r now");
+    }
+
+    public void shutdownPc() {
+        // -h는 halt의 약자로 시스템을 멈추고 종료하라는 의미입니다.
+        runCmd("shutdown -h now");
+    }
+
+    public boolean killChrome() {
+        return runCmd("killall chrome");
+    }
+
+
+    public boolean runCmd(String command) {
+        try {
+            log.info("runCmd command : {}", command);
+            // /c = 문자열로 이루어진 명령어를 실행,
+            new ProcessBuilder("/bin/sh", "-c", command).start();
+//            Process myProcess = Runtime.getRuntime().exec(runCommand);
+//            myProcess.waitFor();
+//
+//            return myProcess.exitValue() == 0;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String runNGetCmd(String command) {
+        try {
+
+            // /c = 문자열로 이루어진 명령어를 실행,
+            Process myProcess = Runtime.getRuntime().exec("/bin/bash " + command);
+            myProcess.waitFor();
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(myProcess.getInputStream(), StandardCharsets.UTF_8));
+            String line;
+            StringBuilder sb = new StringBuilder();
+            sb.append(command);
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+                sb.append("\n");
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public String chromeReboot() {
         if (killChrome()) return runBat() ? "success chrome reboot" : "failed to open chrome";
@@ -42,7 +106,7 @@ public class CmdImpl implements CmdInterface {
     }
 
 
-    public Boolean turnOn(String ip, String mac){
+    public Boolean turnOn(String ip, String mac) {
         final int PORT = 9; // wol 기본 포트
 
         // ip는 broadcast ip로 하는게 좋다.
@@ -90,5 +154,4 @@ public class CmdImpl implements CmdInterface {
 
         return bytes;
     }
-
 }

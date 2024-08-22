@@ -1,17 +1,14 @@
-package kr.co.jsol.jagency.reader.application;
+package kr.co.jsol.jagency.common.application;
 
-import kr.co.jsol.jagency.reader.application.dto.TagDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 
-public interface TagService {
-    final Logger log = LoggerFactory.getLogger(TagService.class);
+public class RestService {
+    final Logger log = LoggerFactory.getLogger(RestService.class);
 
-    public void tag(TagDto tagDto);
-
-    public default boolean pingCheck(String target) {
+    protected boolean pingCheck(String target) {
         String t = target.replaceAll(":[0-9]+$", ""); // 포트번호 삭제
         t = t.replaceAll("\\\\", "/"); // \ -> /로 변경
         t = t.replaceAll("http.*?//", " "); // http(s):// 삭제
@@ -27,7 +24,7 @@ public interface TagService {
     }
 
 
-    public default String containHttpProtocol(String url) {
+    protected String containHttpProtocol(String url) {
         // http(s) 프로토콜 설정이 없으면 기본으로 http 붙여줌
 //        log.info("containHttpProtocol fileUrl : {}", fileUrl);
         log.info("{} is url starts http ? {}", url, isStartHttp(url));
@@ -38,7 +35,7 @@ public interface TagService {
         return url;
     }
 
-    default boolean isStartHttp(String url) {
+    protected boolean isStartHttp(String url) {
         return url.startsWith("http");
     }
 }

@@ -4,9 +4,12 @@ mifare:
   secret-key: FFFFFFFFFFFF
   debug: true
 
+
 app:
   api-server-host: http://192.168.0.39:18010
-  file-path: C://jsolution/jagency # 앱 파일 저장 경로
+  #    file-path: C://jsolution/jagency # 앱 파일 저장 경로
+  file-path: /Volumes/extssd/jsolution # 앱 파일 저장 경로
+  #  extension-id: jagency # 앱 ID
   version-url: /api/open/extensions/version/jagency # 앱 다운로드 URL
   download-url: /api/open/extensions/download/jagency # 앱 다운로드 URL
 

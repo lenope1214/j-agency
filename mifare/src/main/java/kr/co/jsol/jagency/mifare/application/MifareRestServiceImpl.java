@@ -1,15 +1,14 @@
 package kr.co.jsol.jagency.mifare.application;
 
+import kr.co.jsol.jagency.common.application.RestService;
 import kr.co.jsol.jagency.common.infrastructure.exception.GeneralServerException;
 import kr.co.jsol.jagency.mifare.application.dto.WriteMifareDto;
 import kr.co.jsol.jagency.mifare.infrastructure.MifareRepository;
-import kr.co.jsol.jagency.reader.application.TagService;
 import kr.co.jsol.jagency.reader.application.dto.TagDto;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,24 +19,29 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 @Service
-public class MifareTagServiceImpl implements TagService {
+public class MifareRestServiceImpl extends RestService {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Value("${mifare.use:false}")
     private Boolean isUsed;
 
-    @Value("${mifare.tag.url}")
     private String tagUrl;
+
+    @Value("${app.api-server-host:}")
+    private String apiServerHost;
+
+    @Value("${app.tag.endpoint}")
+    private String tagEndpoint;
 
     @Value("${debug:false}")
     private String debug;
 
-    @Value("${app.roomId}")
+    @Value("${app.tag.roomId}")
     private String roomId;
 
     private final RestTemplate restTemplate;
     private final MifareRepository mifareRepository;
 
-    public MifareTagServiceImpl(RestTemplate restTemplate, MifareRepository mifareRepository) {
+    public MifareRestServiceImpl(RestTemplate restTemplate, MifareRepository mifareRepository) {
         this.restTemplate = restTemplate;
         this.mifareRepository = mifareRepository;
     }
@@ -53,12 +57,14 @@ public class MifareTagServiceImpl implements TagService {
 //            log.info("acr122 사용 안함");
 //            return;
 //        }
+        if (apiServerHost.isEmpty()) {
+            throw new GeneralServerException.InternalServerException("app.api-server-host 속성 값은 필수입니다.");
+        }
+
+        tagUrl = apiServerHost + tagEndpoint;
 
         log.info("ReqService 초기화");
         log.info("tagHost : {}", tagUrl);
-        if (tagUrl == null || tagUrl.isEmpty()) {
-            throw new GeneralServerException.InternalServerException("tagHost는 http(https 포함)로 시작해야 합니다.");
-        }
         tagUrl = containHttpProtocol(tagUrl);
         // /로 끝나면 제거
         if (tagUrl.endsWith("/")) {
@@ -71,7 +77,6 @@ public class MifareTagServiceImpl implements TagService {
         }
     }
 
-    @Override
     public void tag(TagDto tagDto) {
 //        if (!isUsed) {
 //            log.info("acr122 사용 안함");
@@ -81,46 +86,18 @@ public class MifareTagServiceImpl implements TagService {
         try {
             log.info("API URL : {}", tagUrl);
             log.info("tagNo: {}, roomId: {}", tagDto.getTagNo(), tagDto.getRoomId());
-            ResponseEntity<Boolean> responseEntity = restTemplate.postForEntity(tagUrl, tagDto, Boolean.class);
-            Boolean body = responseEntity.getBody();
-            log.info("ResponseCode : {}", responseEntity.getStatusCode());
-            log.info("ResponseBody : {}", body);
+
+            restTemplate.postForEntity(tagUrl, tagDto, Boolean.class);
 
             // 에러는 exception에서 잡힘
             log.info("태깅 성공");
-//            try {760886
-//                data = tagDto.getData();
-//                params.put("pid", data[0]);
-//            } catch (Exception ignored) {
-//            }
-//
-//            params.put("ip", input.get("ip"));
-//
-////            log.info("파라미터 :" + params.toString());
-//            String json = JsonFormatter(params);
-//            byte[] requestBody = json.toString().getBytes("UTF-8");
-//            if (isDebug()) log.info("데이터 요청 전");
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//            HttpConnectionUtils.setDefaultSettings(conn);
-//            conn.setRequestMethod("POST");
-//            conn.setDoOutput(true);
-//
-//            try {
-//                if (isDebug()) log.info("데이터 쓰기 중");
-//                conn.getOutputStream().write(requestBody);
-//            } catch (Exception ignored) {
-//            }
-//            if (isDebug()) log.info("데이터 요청 종료");
-//
-//            // 주의))) input stream 주석처리하면 데이터 통신이 진행되지 않음.
-//            BufferedReader in = new BufferedReader((new InputStreamReader(conn.getInputStream(), "UTF-8")));
         } catch (Exception e) {
             // 에러 형식 : STATUS : "{"property":"value",...}"
             // 여기서 property를 추출하여 사용하면 됨
             String errorBody = e.getMessage();
 
             // 만약  HTTP_STATUS(4xx~5xx) : "{"property":"value",...}" 의 형태라면 서버 에러이므로 처리
-            if (errorBody.indexOf(": {") == -1) {
+            if (!errorBody.contains(": {")) {
                 log.error("MESSAGE : {}", errorBody);
                 return;
             }

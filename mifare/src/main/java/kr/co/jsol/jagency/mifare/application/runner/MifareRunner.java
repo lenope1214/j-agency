@@ -1,11 +1,14 @@
 package kr.co.jsol.jagency.mifare.application.runner;
 
-import kr.co.jsol.jagency.reader.application.CmdImpl;
+import kr.co.jsol.jagency.common.application.VersionManagerService;
+import kr.co.jsol.jagency.common.application.cmd.CmdService;
 import kr.co.jsol.jagency.reader.application.runner.TagRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class MifareRunner implements TagRunner {
@@ -16,39 +19,49 @@ public class MifareRunner implements TagRunner {
     @Value("${mifare.use:false}")
     String use;
 
-    // application.yaml로 설정해도 되지만
-    // 불특정 다수의 PC에 설치할 경우가 더 많기 때문에
-    // 서버 실행시 --acr122.rfid-reader-id=1 이런식으로 실행해 값을 설정한다.
-    @Value("${mifare.rfid-reader-id:}")
-    String rfidReaderId;
-
     @Value("${app.version:}")
     private String appVersion;
 
-    @Value("${app.downloadUrl:}")
-    private String appDownloadUrl;
-
-    // 아래 값들은 추후에 server에서 받아옴.
-    String ip;
-    String target;
-    String batUrl;
-
-    //    private final KnuhApiServiceImpl knuhApiService;
-//
-//    private final VersionManagerService versionManagerService;
-//
     private final MifareReader mifareReader;
-    private final CmdImpl cmdService;
+    private final VersionManagerService versionManagerService;
+    private final CmdService cmdService;
 
-    public MifareRunner(MifareReader mifareReader, CmdImpl cmdService) {
+    public MifareRunner(MifareReader mifareReader, CmdService cmdService, VersionManagerService versionManagerService) {
         this.mifareReader = mifareReader;
         this.cmdService = cmdService;
+        this.versionManagerService = versionManagerService;
     }
 
-    @Override
+    @PostConstruct
     public void init() {
-        log.info("Acr122Runner init - version {}", appVersion);
-        // 서버에서 데이터를 받는다던가 초기 데이터 세팅을 한다던가 한다.
+        log.info("ls -l 실행으로 cmd 테스트");
+        String result = cmdService.runNGetCmd("ls -l");
+        log.info("ls -l 결과 : {}", result);
+        try {
+            // 버전을 가져온다.
+            String version = versionManagerService.getVersion();
+            log.info("현재 앱 버전 : {}", appVersion);
+            log.info("최신 반영 버전 : {}", version);
+
+            if (!version.equals(appVersion)) {
+                log.info("최신 반영 버전을 다운로드 합니다.");
+                boolean downloaded = versionManagerService.download(false);
+                log.info("파일 다운로드 결과 : {}", downloaded);
+
+                // 다운로드 성공시 재시작 파일을 실행하여 재시작
+                if (downloaded) {
+                    // 1초 대기 후 재시작
+                    Thread.sleep(1000);
+
+                    cmdService.restartProgram();
+                }
+            }
+
+//            versionManagerService.download(false);
+        } catch (Exception e) {
+            log.error("app download error : {}", e.getMessage());
+        }
+
     }
 
     @Override

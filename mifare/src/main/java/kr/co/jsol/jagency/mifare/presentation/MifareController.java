@@ -1,6 +1,6 @@
 package kr.co.jsol.jagency.mifare.presentation;
 
-import kr.co.jsol.jagency.mifare.application.MifareTagServiceImpl;
+import kr.co.jsol.jagency.mifare.application.MifareRestServiceImpl;
 import kr.co.jsol.jagency.mifare.application.dto.WriteMifareDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +11,9 @@ import java.io.IOException;
 @RequestMapping("/api/reader/mifare")
 public class MifareController {
 
-    private final MifareTagServiceImpl mifareTagService;
+    private final MifareRestServiceImpl mifareTagService;
 
-    public MifareController(MifareTagServiceImpl mifareTagService) {
+    public MifareController(MifareRestServiceImpl mifareTagService) {
         this.mifareTagService = mifareTagService;
     }
 

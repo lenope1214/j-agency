@@ -34,6 +34,9 @@ plugins {
     kotlin("plugin.allopen") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
+
+    kotlin("plugin.lombok") version "2.0.10"
+    id("io.freefair.lombok") version "8.1.0"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -65,6 +68,10 @@ subprojects {
         plugin("kotlin-spring")
         plugin("kotlin-jpa")
         plugin("kotlin-kapt")
+
+        // support lombok
+        plugin("kotlin-lombok")
+        plugin("io.freefair.lombok")
     }
 
     dependencies {
@@ -89,7 +96,7 @@ subprojects {
         // lombok
         compileOnly("org.projectlombok:lombok:${lombokVersion}")
         implementation("org.projectlombok:lombok:${lombokVersion}")
-        annotationProcessor("org.projectlombok:lombok")
+        annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
         testImplementation("org.projectlombok:lombok:${lombokVersion}")
 
         // springdoc
@@ -138,6 +145,9 @@ subprojects {
         // gson
         implementation("com.google.code.gson:gson:2.8.9")
 
+        // file io
+        implementation("commons-io:commons-io:2.16.1")
+
 
         // JAVA MP3 재생 라이브러리
         // https://mvnrepository.com/artifact/javazoom/jlayer
@@ -176,5 +186,10 @@ subprojects {
         java {
             srcDirs("${layout.buildDirectory}/generated/source/kapt/main")
         }
+    }
+
+    kapt {
+        // support lombok
+        keepJavacAnnotationProcessors = true
     }
 }
