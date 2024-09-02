@@ -24,6 +24,9 @@ public class MifareRestServiceImpl extends RestService {
     @Value("${mifare.use:false}")
     private Boolean isUsed;
 
+    @Value("${app.tag.mode:read}")
+    private String mode;
+
     private String tagUrl;
 
     @Value("${app.api-server-host:}")
@@ -122,7 +125,9 @@ public class MifareRestServiceImpl extends RestService {
     }
 
     public void write(WriteMifareDto writeMifareDto) throws IOException {
-        mifareRepository.writeToCards(writeMifareDto);
+        if (mode.equals("write")) {
+            mifareRepository.writeToCards(writeMifareDto);
+        }
     }
 
     public void read() throws IOException {

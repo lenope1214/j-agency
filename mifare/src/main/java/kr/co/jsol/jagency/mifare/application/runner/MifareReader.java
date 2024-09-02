@@ -18,6 +18,9 @@ public class MifareReader implements Readable {
     @Value("${mifare.debug:false}")
     Boolean debug;
 
+    @Value("${app.tag.mode:read}")
+    private String mode; // read, write
+
     private HashMap<String, Object> requestBody;
 
     public MifareReader(MifareRestServiceImpl mifareTagService) {
@@ -35,7 +38,7 @@ public class MifareReader implements Readable {
 //        TODO tag test 테스트 후 제거
 //        mifareRepository.sendServer().accept("test");
 
-        while (true) {
+        while (mode.equals("read")) {
             try {
                 if (mifareTagService.isConnected()) {
                     log.info("Connected to ACR122");
