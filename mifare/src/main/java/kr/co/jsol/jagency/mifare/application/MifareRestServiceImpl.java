@@ -32,13 +32,13 @@ public class MifareRestServiceImpl extends RestService {
     @Value("${app.api-server-host:}")
     private String apiServerHost;
 
-    @Value("${app.tag.endpoint}")
+    @Value("${app.tag.endpoint:}")
     private String tagEndpoint;
 
     @Value("${debug:false}")
     private String debug;
 
-    @Value("${app.tag.roomId}")
+    @Value("${app.tag.roomId:}")
     private String roomId;
 
     private final RestTemplate restTemplate;
@@ -56,10 +56,10 @@ public class MifareRestServiceImpl extends RestService {
     // 서비스 생성 후 초기화
     @PostConstruct
     public void init() {
-//        if (!isUsed) {
-//            log.info("acr122 사용 안함");
-//            return;
-//        }
+        if (!isUsed) {
+            log.info("acr122 사용 안함");
+            return;
+        }
         if (apiServerHost.isEmpty()) {
             throw new GeneralServerException.InternalServerException("app.api-server-host 속성 값은 필수입니다.");
         }

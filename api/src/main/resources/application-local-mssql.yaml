@@ -18,7 +18,7 @@ spring:
     properties:
       hibernate:
         # to use custom function
-        dialect: kr.co.jsol.hcpf.common.infrastructure.database.hibernate.Mssql2016FunctionsDialect
+        dialect: kr.co.jsol.jagency.common.infrastructure.database.hibernate.Mssql2016FunctionsDialect
         format_sql: true
         default_batch_fetch_size: 1000
         highlight_sql: true
@@ -40,7 +40,7 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION:2592000000}
   ## 365일
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:31536000000}
-  
+
 logging:
   level:
     org:

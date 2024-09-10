@@ -83,6 +83,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-actuator")
         implementation("org.springframework.boot:spring-boot-starter-validation")
         kapt("org.springframework.boot:spring-boot-configuration-processor")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
         implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -186,6 +187,17 @@ subprojects {
         java {
             srcDirs("${layout.buildDirectory}/generated/source/kapt/main")
         }
+    }
+
+    sourceSets.getByName("test") {
+        java {
+            srcDirs("${layout.buildDirectory}/generated/source/kapt/test")
+        }
+    }
+
+    // skip complieKotlin
+    tasks.withType<JavaCompile> {
+        enabled = false
     }
 
     kapt {

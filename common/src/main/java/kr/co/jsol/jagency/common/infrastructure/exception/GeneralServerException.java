@@ -1,5 +1,6 @@
 package kr.co.jsol.jagency.common.infrastructure.exception;
 
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 
 public abstract class GeneralServerException {
@@ -32,12 +33,16 @@ public abstract class GeneralServerException {
      * 파일 시스템 관리 중 에러 발생
      */
     public static class ManageSystemFileException extends CustomException {
-        public ManageSystemFileException(String message, Throwable e) {
-            super("GNR-FILE-0001", message != null ? message : "시스템 파일 관리 중 오류가 발생했습니다", HttpStatus.BAD_REQUEST, e);
+        public ManageSystemFileException(@NonNull String message, Throwable e) {
+            super("GNR-FILE-0001", message, HttpStatus.INTERNAL_SERVER_ERROR, e);
+        }
+
+        public ManageSystemFileException(@NonNull String message) {
+            super("GNR-FILE-0001", message, HttpStatus.INTERNAL_SERVER_ERROR, null);
         }
 
         public ManageSystemFileException() {
-            this("시스템 파일 관리 중 오류가 발생했습니다", null);
+            this("시스템 파일 관리 중 오류가 발생했습니다");
         }
     }
 }

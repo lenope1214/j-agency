@@ -1,0 +1,15 @@
+app:
+  api-server-host: https://jem.huclo.co.kr
+  file-path: C://jsolution/jagency # 앱 파일 저장 경로
+  version-url: /api/open/extensions/version/jagency # 앱  Endpoint
+  get-extension-info-url: /api/open/extensions/jagency # 앱 정보 조회 Endpoint
+  s
+file-to-db:
+  active: true
+  cron: 0 0 0 * * * # 매일 0시 0분 0초에 실행
+  file-path: C://jsolution/dbdata # 파일 경로
+  file-type: csv # 파일 타입
+
+  csv:
+    # 컬럼 명들
+    columns: measuredAt,infraredTemperature,maxTemperature,distance,close

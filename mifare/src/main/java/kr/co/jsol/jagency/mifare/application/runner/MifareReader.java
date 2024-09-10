@@ -15,6 +15,9 @@ public class MifareReader implements Readable {
     private final Logger log = LoggerFactory.getLogger(MifareReader.class);
     private final MifareRestServiceImpl mifareTagService;
 
+    @Value("${mifare.use:false}")
+    Boolean isUsed;
+
     @Value("${mifare.debug:false}")
     Boolean debug;
 
@@ -38,7 +41,7 @@ public class MifareReader implements Readable {
 //        TODO tag test 테스트 후 제거
 //        mifareRepository.sendServer().accept("test");
 
-        while (mode.equals("read")) {
+        while (isUsed && mode.equals("read")) {
             try {
                 if (mifareTagService.isConnected()) {
                     log.info("Connected to ACR122");
