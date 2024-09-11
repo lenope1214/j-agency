@@ -3,7 +3,6 @@ plugins {
 }
 rootProject.name = "j-agency"
 include("api")
-include("batch")
 include("ccr-hfn")
 include("common")
 include("file")
