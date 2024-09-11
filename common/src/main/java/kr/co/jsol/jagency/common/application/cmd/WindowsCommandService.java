@@ -1,6 +1,7 @@
 package kr.co.jsol.jagency.common.application.cmd;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -11,21 +12,20 @@ import java.net.InetAddress;
 @Slf4j
 public class WindowsCommandService implements CmdService {
 
+    private ApplicationContext context;
+
     // 크롬 배치파일이 없다면 기본으로 chrome을 실행한다.
     private String batUrl;
 
     private String restartFileName = "restart.bat";
 
-
-    public WindowsCommandService(
-            String batUrl
-    ) {
+    public WindowsCommandService(String batUrl) {
         this.batUrl = batUrl;
     }
 
-
     public void restartProgram() {
         if (restartFileName != null) {
+            log.info("restartFileName : {}", restartFileName);
             runCmd(restartFileName);
         }
     }
@@ -48,11 +48,9 @@ public class WindowsCommandService implements CmdService {
 
             // /c = 문자열로 이루어진 명령어를 실행,
 //            Process myProcess = Runtime.getRuntime().exec("cmd /c " + command);
-            new ProcessBuilder("cmd", "/c", command).start();
+            ProcessBuilder process = new ProcessBuilder("cmd", "/c", command);
+            process.start();
 
-//            myProcess.waitFor();
-//
-//            return myProcess.exitValue() == 0;
             return true;
         } catch (Exception e) {
             return false;

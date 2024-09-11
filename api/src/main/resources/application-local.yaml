@@ -17,7 +17,7 @@ spring:
     properties:
       hibernate:
         # to use custom function
-        dialect: kr.co.jsol.hcpf.common.infrastructure.database.hibernate.MariaDBFunctionsDialect
+        dialect: kr.co.jsol.jagency.common.infrastructure.database.hibernate.MariaDBFunctionsDialect
         format_sql: true
         default_batch_fetch_size: 1000
         highlight_sql: true

@@ -1,6 +1,8 @@
 package kr.co.jsol.jagency.common.application;
 
 import kr.co.jsol.jagency.common.application.cmd.CmdService;
+import kr.co.jsol.jagency.common.application.dto.ExtensionDto;
+import kr.co.jsol.jagency.common.infrastructure.exception.GeneralServerException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +18,14 @@ import java.net.URL;
 @Slf4j
 @Service
 public class VersionManagerService extends RestService {
-    @Value("${app.api-server-host:}")
-    private String apiServerHost;
+    @Value("${app.file-server-host:}")
+    private String appFileServerHost;
 
     @Value("${app.version-url:}")
     private String appVersionUrl;
 
-    @Value("${app.download-url:}")
-    private String appDownloadUrl;
+    @Value("${app.get-extension-info-url:}")
+    private String appInfoUrl;
 
     @Value("${app.file-path:}")
     private String appFilePath;
@@ -41,7 +43,7 @@ public class VersionManagerService extends RestService {
     }
 
     public String getVersion() {
-        String apiUrl = apiServerHost + appVersionUrl;
+        String apiUrl = appFileServerHost + appVersionUrl;
         log.info("[VMS - getVersion] apiUrl : {}", apiUrl);
 //
 //            // http 프로토콜 설정이 없으면 기본으로 http 붙여줌
@@ -55,25 +57,33 @@ public class VersionManagerService extends RestService {
         try {
             storageService.pathGenerate(appFilePath);
 
-            //            //파일 다운로드할 URI 입력
-            String apiUrl = apiServerHost + appDownloadUrl;
+            // 파일 정보 가져오기
+            String apiUrl = appFileServerHost + appInfoUrl;
 //
 //            // http 프로토콜 설정이 없으면 기본으로 http 붙여줌
             apiUrl = containHttpProtocol(apiUrl);
+            log.info("[VMS - download] app info api url : {}", apiUrl);
+
+            // 파일 정보 조회
+            ExtensionDto extensionDto = restTemplate.getForObject(apiUrl, ExtensionDto.class);
+            if (extensionDto == null) {
+                log.error("파일 정보를 가져오지 못했습니다.");
+                throw new GeneralServerException.ManageSystemFileException();
+            }
+            String downloadUrl = extensionDto.getFile().getDownloadUrl();
 
             final String newFileName = "new_jagency.jar";
-
-            File resFile = fileDownOnHttp(apiUrl, appFilePath + "/" + newFileName);
+            File resFile = fileDownOnHttp(downloadUrl, appFilePath + File.separatorChar + newFileName);
 
             if (isReboot) cmd.rebootPc(); // 즉시 재부팅 명령어
             // 파일이 정상적으로 다운이 됐다면 true 반환
             return resFile.exists();
-        } catch (IOException e) {
-            log.error("파일 다운로드 중 에러 발생 : {}", e.getMessage());
-            e.printStackTrace();
-            return false;
         } catch (IllegalArgumentException e) {
             log.error("파일 저장 경로가 지정되어있지 않습니다. 'app.file-path'를 확인해주세요.");
+            return false;
+        } catch (Exception e) {
+            log.error("파일 다운로드 중 에러 발생 : {}", e.getMessage());
+            e.printStackTrace();
             return false;
         }
 

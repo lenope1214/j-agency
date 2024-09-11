@@ -6,7 +6,7 @@ mifare:
 
 
 app:
-  api-server-host: http://192.168.0.39:18010
+  file-server-host: http://192.168.0.39:18010
   #    file-path: C://jsolution/jagency # 앱 파일 저장 경로
   file-path: /Volumes/extssd/jsolution # 앱 파일 저장 경로
   #  extension-id: jagency # 앱 ID

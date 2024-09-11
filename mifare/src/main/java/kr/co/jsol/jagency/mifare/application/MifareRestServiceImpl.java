@@ -29,16 +29,16 @@ public class MifareRestServiceImpl extends RestService {
 
     private String tagUrl;
 
-    @Value("${app.api-server-host:}")
-    private String apiServerHost;
+    @Value("${app.file-server-host:}")
+    private String appFileServerHost;
 
-    @Value("${app.tag.endpoint}")
+    @Value("${app.tag.endpoint:}")
     private String tagEndpoint;
 
     @Value("${debug:false}")
     private String debug;
 
-    @Value("${app.tag.roomId}")
+    @Value("${app.tag.roomId:}")
     private String roomId;
 
     private final RestTemplate restTemplate;
@@ -56,15 +56,15 @@ public class MifareRestServiceImpl extends RestService {
     // 서비스 생성 후 초기화
     @PostConstruct
     public void init() {
-//        if (!isUsed) {
-//            log.info("acr122 사용 안함");
-//            return;
-//        }
-        if (apiServerHost.isEmpty()) {
-            throw new GeneralServerException.InternalServerException("app.api-server-host 속성 값은 필수입니다.");
+        if (!isUsed) {
+            log.info("acr122 사용 안함");
+            return;
+        }
+        if (appFileServerHost.isEmpty()) {
+            throw new GeneralServerException.InternalServerException("app.file-server-host 속성 값은 필수입니다.");
         }
 
-        tagUrl = apiServerHost + tagEndpoint;
+        tagUrl = appFileServerHost + tagEndpoint;
 
         log.info("ReqService 초기화");
         log.info("tagHost : {}", tagUrl);

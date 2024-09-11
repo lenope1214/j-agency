@@ -1,0 +1,15 @@
+app:
+  file-server-host: https://jem.huclo.co.kr
+  file-path: /Volumes/extssd/jsolution/jagency # 앱 파일 저장 경로
+  version-url: /api/open/extensions/version/jagency # 앱  Endpoint
+  get-extension-info-url: /api/open/extensions/jagency # 앱 정보 조회 Endpoint
+
+file-to-db:
+  active: true
+  key: daedong
+  #  company-id: 1001b2cf-642c-4da6-b61d-f921c1454a78
+  company-id: fe8d42d3-d1ef-463f-8dee-7ce1306314b8 # 계정: companyString
+  #  file-path: C://jsolution/dbdata # 파일 경로
+  file-path: /Volumes/extssd/jsolution/dbdata # 파일 경로
+  api-url: https://j-erp-staging.huclo.co.kr/api/v1/temperature-monitoring/j-agency/backup
+#  api-url: https://j-erp-production.huclo.co.kr/api/v1/temperature-monitoring/j-agency/backup

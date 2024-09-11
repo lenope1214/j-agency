@@ -83,6 +83,7 @@ subprojects {
         implementation("org.springframework.boot:spring-boot-starter-actuator")
         implementation("org.springframework.boot:spring-boot-starter-validation")
         kapt("org.springframework.boot:spring-boot-configuration-processor")
+        implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
         implementation("net.logstash.logback:logstash-logback-encoder:7.3")
 
@@ -170,6 +171,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn")
+            jvmTarget = "1.8"
         }
     }
 
@@ -187,6 +189,17 @@ subprojects {
             srcDirs("${layout.buildDirectory}/generated/source/kapt/main")
         }
     }
+
+    sourceSets.getByName("test") {
+        java {
+            srcDirs("${layout.buildDirectory}/generated/source/kapt/test")
+        }
+    }
+
+//    // skip complieKotlin, 절대 사용하지 말 것
+//    tasks.withType<JavaCompile> {
+//        enabled = false
+//    }
 
     kapt {
         // support lombok
