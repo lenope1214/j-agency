@@ -5,7 +5,7 @@ mifare:
   debug: true
 
 app:
-  api-server-host: http://192.168.12.150:18010
+  file-server-host: http://192.168.12.150:18010
   file-path: C://jsolution/jagency # 앱 파일 저장 경로
   version-url: /api/open/extensions/version/jagency # 앱 다운로드 Endpoint
   download-url: /api/open/extensions/download/jagency # 앱 다운로드 Endpoint
