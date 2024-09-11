@@ -2,53 +2,51 @@ package kr.co.jsol.jagency.filecsv.application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.time.LocalDateTime;
+import java.io.File;
+import java.util.List;
 
 @Service
 public class CsvToDBService {
     private final Logger log = LoggerFactory.getLogger(CsvToDBService.class);
-    // 경로에 파일들 가져오기
-    private final String versionFile = "version.txt";
 
-    public LocalDateTime lastUploadTime() {
-        // 파일을 읽어서 마지막 업로드 시간 확인
-        // 파일이 없다면 새로 생성하고, 파일에 현재 시간을 입력한다.
-        LocalDateTime lastUploadTime = null;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(versionFile));
-            String line = br.readLine();
+    @Value("${file-to-db.file-path:}")
+    private String filePath;
 
-            if (line == null) {
-                lastUploadTime = LocalDateTime.now();
-                br.close();
-                writeLastUploadTime(lastUploadTime);
-            } else {
-                lastUploadTime = LocalDateTime.parse(line);
-                br.close();
-            }
+    private final CsvReader csvReader;
 
-            br.close();
-        } catch (IOException e) {
-            log.error("version.txt 파일을 읽어오는데 실패했습니다.");
-            e.printStackTrace();
-        }
-        return lastUploadTime;
+    public CsvToDBService(CsvReader csvReader) {
+        this.csvReader = csvReader;
     }
 
-    private void writeLastUploadTime(LocalDateTime lastUploadTime) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(versionFile));
-            bw.write(lastUploadTime.toString());
-            bw.flush();
-            bw.close();
-        } catch (IOException e) {
-            log.error("version.txt 파일을 쓰는데 실패했습니다.");
-            e.printStackTrace();
+    public File getCsvFile(String filename) {
+        File file = new File(filePath + File.separatorChar + filename);
+        if (!file.exists()) {
+            log.error("파일이 존재하지 않습니다. 파일명 : {}", filename);
+            return null;
         }
+
+        if (!file.canRead()) {
+            log.error("파일을 읽을 수 없습니다. 파일명 : {}", filename);
+            return null;
+        }
+
+        // csv 파일인지 확인
+        if (!filename.endsWith(".csv")) {
+            log.error("csv 파일이 아닙니다. 파일명 : {}", filename);
+            return null;
+        }
+
+        return file;
     }
 
+    public List<List<String>> readData(String filePath) {
+        return csvReader.read(filePath);
+    }
 
+    public void printData(List<List<String>> csvList) {
+        csvReader.printCsv(csvList);
+    }
 }

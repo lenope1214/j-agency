@@ -15,14 +15,25 @@ public class CsvReader {
 
     public List<List<String>> read(String csvFilePath) {
         List<List<String>> csvList = new ArrayList<List<String>>();
-        File csv = new File(csvFilePath);
         BufferedReader br = null;
         String line = "";
 
         try {
-            br = new BufferedReader(new FileReader(csv));
+            br = new BufferedReader(
+                    // FileReader 사용시 한글 깨짐 현상 발생, InputStreamReader 사용하여 해결
+                    new InputStreamReader(
+                            new FileInputStream(csvFilePath),
+                            "EUC-KR"
+                    )
+            );
+
+            // 첫 row는 header로 생각하고 skip
+            String header = br.readLine();
+            log.info("header : {}", header);
+
             while ((line = br.readLine()) != null) {
                 String[] token = line.split(",");
+//                log.info("read line : {}", line);
                 List<String> list = new ArrayList<>();
                 Collections.addAll(list, token);
                 csvList.add(list);
@@ -37,9 +48,16 @@ public class CsvReader {
     }
 
     public void printCsv(List<List<String>> csvList) {
+        long count = 0L;
         for (List<String> list : csvList) {
+            String line = "";
             for (String str : list) {
-                log.info(str);
+                line += str + ",";
+            }
+            if (!line.isEmpty()) {
+                line = line.substring(0, line.length() - 1);
+//                log.info(line);
+//                System.out.println("["+(count++ + 1) + "] = " + line);
             }
         }
     }
