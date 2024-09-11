@@ -171,6 +171,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn")
+            jvmTarget = "1.8"
         }
     }
 
@@ -195,10 +196,10 @@ subprojects {
         }
     }
 
-    // skip complieKotlin
-    tasks.withType<JavaCompile> {
-        enabled = false
-    }
+//    // skip complieKotlin, 절대 사용하지 말 것
+//    tasks.withType<JavaCompile> {
+//        enabled = false
+//    }
 
     kapt {
         // support lombok

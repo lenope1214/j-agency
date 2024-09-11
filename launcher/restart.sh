@@ -13,5 +13,5 @@ lsof -i :18032 | tail -1 | awk '{print $2}' | xargs -I {} kill {}
 # new_jagency.jar 파일을 기존 파일로 대체
 mv new_jagency.jar jagency.jar
 
-# start.bat 파일 실행
+# daegyung.bat 파일 실행
 sh start.sh
