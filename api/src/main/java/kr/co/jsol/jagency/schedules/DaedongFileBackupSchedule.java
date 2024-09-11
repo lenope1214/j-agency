@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -81,6 +83,11 @@ public class DaedongFileBackupSchedule {
     public void run() {
         // active가 false거나, key가 "daedong"이 아니면 실행하지 않는다.
         if (!active || !key.equals("daedong")) {
+            return;
+        }
+
+        if (!netIsAvailable()) {
+            log.error("\n\nNetwork is not available...\n\n");
             return;
         }
 
@@ -206,6 +213,18 @@ public class DaedongFileBackupSchedule {
         } catch (IOException e) {
             log.error("version.txt 파일을 쓰는데 실패했습니다.");
             e.printStackTrace();
+        }
+    }
+
+    private static boolean netIsAvailable() {
+        try {
+            final URL url = new URL("https://j-erp-production.huclo.co.kr");
+            final URLConnection conn = url.openConnection();
+            conn.connect();
+            conn.getInputStream().close();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
