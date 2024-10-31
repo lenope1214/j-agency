@@ -5,6 +5,7 @@ import kr.co.jsol.jagency.filecsv.application.CsvToDBService;
 import kr.co.jsol.jagency.filecsv.application.dto.JerpCreateTemperatureMonitoringRequest;
 import kr.co.jsol.jagency.filecsv.application.dto.TemperatureMonitoring;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,11 +21,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 @Component
 public class DaedongFileBackupSchedule {
-    private final Logger log = getLogger(DaedongFileBackupSchedule.class);
+    private final Logger log = LoggerFactory.getLogger(DaedongFileBackupSchedule.class);
     private final RestTemplate restTemplate;
     private final CsvToDBService csvToDBService;
     private final StorageService storageService;
@@ -127,11 +126,6 @@ public class DaedongFileBackupSchedule {
                 temperatureMonitorings.add(requestDto);
             }); // end of readData.forEach
 
-            // 데이터 앞 100개 확인
-//            for (int i = 0; i < 100; i++) {
-//                log.info("{}", requestBody.get(i));
-//            }
-
             JerpCreateTemperatureMonitoringRequest requestBody = new JerpCreateTemperatureMonitoringRequest(companyId, temperatureMonitorings);
 
             // https://j-erp-production.huclo.co.kr/api/v1/temperature-monitoring/j-agency/backup
@@ -140,7 +134,7 @@ public class DaedongFileBackupSchedule {
             if (body == null || !body) {
                 // 실패, 데이터 백업
                 log.error("Failed to backup data!!");
-//                log.error("Failed to backup data: {}", requestBody);
+                return;
             }
 
             // 성공, 해당 파일을 삭제한다.
