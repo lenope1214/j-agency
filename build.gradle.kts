@@ -152,7 +152,9 @@ subprojects {
 
         // JAVA MP3 재생 라이브러리
         // https://mvnrepository.com/artifact/javazoom/jlayer
-        implementation("javazoom:jlayer:1.0.1")
+//        implementation("javazoom:jlayer:1.0.1")
+        // 사운드 출력용 lib
+        implementation(files("libs/jaco-mp3-player-0.9.3.jar"))
 
         // test
         testImplementation("org.springframework.boot:spring-boot-starter-test")
