@@ -190,17 +190,17 @@ subprojects {
         )
     }
 
-    sourceSets.getByName("main") {
-        java {
-            srcDirs("${layout.buildDirectory}/generated/source/kapt/main")
-        }
-    }
-
-    sourceSets.getByName("test") {
-        java {
-            srcDirs("${layout.buildDirectory}/generated/source/kapt/test")
-        }
-    }
+//    sourceSets.getByName("main") {
+//        java {
+//            srcDirs("${layout.buildDirectory}/generated/source/kapt/main")
+//        }
+//    }
+//
+//    sourceSets.getByName("test") {
+//        java {
+//            srcDirs("${layout.buildDirectory}/generated/source/kapt/test")
+//        }
+//    }
 
 //    // skip complieKotlin, 절대 사용하지 말 것
 //    tasks.withType<JavaCompile> {

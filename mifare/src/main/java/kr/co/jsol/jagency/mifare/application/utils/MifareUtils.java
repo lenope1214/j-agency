@@ -26,7 +26,7 @@ package kr.co.jsol.jagency.mifare.application.utils;
 import kr.co.jsol.jagency.common.application.utils.HexUtils;
 import kr.co.jsol.jagency.common.infrastructure.exception.CustomException;
 import kr.co.jsol.jagency.common.infrastructure.exception.GeneralClientException;
-import kr.co.jsol.jagency.common.infrastructure.exception.domain.MifareClassic1KException;
+import kr.co.jsol.jagency.common.infrastructure.exception.entity.MifareClassic1KException;
 import org.nfctools.mf.MfAccess;
 import org.nfctools.mf.MfException;
 import org.nfctools.mf.MfReaderWriter;

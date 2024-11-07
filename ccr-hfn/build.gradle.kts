@@ -13,8 +13,7 @@ plugins {
 
 dependencies {
     implementation(project(":common"))
-
-
+    
     implementation("net.java.dev.jna:jna:5.8.0")
     implementation("com.google.guava:guava:18.0")
     implementation("com.google.code.gson:gson:2.8.6")

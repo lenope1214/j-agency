@@ -1,14 +1,13 @@
 package kr.co.jsol.jagency.common.infrastructure.exception;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import antlr.ANTLRException;
+import antlr.NoViableAltException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.endpoint.invoke.MissingParametersException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.PersistenceException;
 import javax.validation.UnexpectedTypeException;
 import java.security.InvalidParameterException;
 import java.util.NoSuchElementException;
@@ -58,28 +58,37 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionBody> illegalArgumentExceptionHandler(IllegalArgumentException ex) {
         ex.printStackTrace();
-        log.error("illegalArgumentExceptionHandler - message : {}", ex.getMessage());
-        return new GeneralServerException.InternalServerException().toEntity(ex.getMessage());
+        String message = ex.getMessage();
+        log.error("illegalArgumentExceptionHandler - message : {}", message);
+
+//        if (message.contains("org.hibernate")) {
+//            return new GeneralServerException.InternalServerException().toEntity();
+//        }
+//
+//        return new GeneralServerException.InternalServerException().toEntity(message);
+        return new GeneralServerException.InternalServerException().toEntity();
     }
 
     /**
      * 요청 매개변수가 잘못되었을 경우
      */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ExceptionBody> dtoTypeMissMatchException(HttpMessageNotReadableException ex) {
-        String msg;
-        Throwable causeException = ex.getCause();
-        if (causeException instanceof InvalidFormatException) {
-            InvalidFormatException ife = (InvalidFormatException) causeException;
-            msg = "입력 받은 " + ife.getValue() + " 를 " + ife.getTargetType() + " 으로 변환중 에러가 발생했습니다.";
-        } else if (causeException instanceof MissingParametersException) {
-            MissingParametersException mkpe = (MissingParametersException) causeException;
-            msg = "Parameter is missing: " + mkpe.getMessage();
-        } else {
-            msg = "요청을 역직렬화 하는과정에서 예외가 발생했습니다.";
-        }
-        return new GeneralClientException.BadRequestException().toEntity(msg);
-    }
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    public ResponseEntity<ExceptionBody> dtoTypeMissMatchException(HttpMessageNotReadableException ex) {
+//        String msg;
+//        Throwable causeException = ex.getCause();
+//        log.error("causeException : {}", causeException);
+//        if (causeException instanceof JsonParseException) {
+//            msg = "요청 값을 Json 형식으로 변환하는 과정에서 에러가 발생했습니다.";
+//        } else if (causeException instanceof InvalidFormatException ife) {
+//            msg = "입력 받은 " + ife.getValue() + " 를 " + ife.getTargetType() + " 으로 변환중 에러가 발생했습니다.";
+//        } else if (causeException instanceof MissingKotlinParameterException mkpe) {
+//            msg = "Parameter is missing: " + mkpe.getParameter().getName();
+//        } else {
+//            msg = "요청을 역직렬화 하는과정에서 예외가 발생했습니다.";
+//        }
+//        log.error("dtoTypeMissMatchException - message : {}", msg);
+//        return new GeneralClientException.BadRequestException().toEntity(msg);
+//    }
 
     /**
      * 요청 매개변수가 잘못되었을 경우
@@ -116,6 +125,14 @@ public class ApiExceptionHandler {
         log.error("UnexpectedTypeException - message : {}", ex.getMessage());
         return new GeneralServerException.InternalServerException().toEntity(ex.getMessage());
     }
+
+    /**
+     * 토큰이 유효하지 않을 경우
+     */
+//    @ExceptionHandler(SignatureException.class)
+//    public ResponseEntity<ExceptionBody> handleSignatureException(SignatureException ex) {
+//        return new GeneralClientException.BadRequestException().toEntity("토큰이 유효하지 않습니다.");
+//    }
 
     /**
      * NullPointException 예외 처리 메서드입니다.
@@ -167,6 +184,12 @@ public class ApiExceptionHandler {
         log.error("NoSuchElementException - localizedMessage: {}", ex.getLocalizedMessage());
         String message = "요청이 올바르지 않습니다. \n" + ex.getLocalizedMessage();
         return new GeneralClientException.BadRequestException().toEntity(message);
+    }
+
+    @ExceptionHandler({PersistenceException.class, ANTLRException.class, NoViableAltException.class})
+    public ResponseEntity<ExceptionBody> handleDBException(PersistenceException ex) {
+        log.error("PersistenceException - message : {}", ex.getMessage());
+        return new GeneralServerException.InternalServerException().toEntity();
     }
 
     @ExceptionHandler(CustomException.class)
