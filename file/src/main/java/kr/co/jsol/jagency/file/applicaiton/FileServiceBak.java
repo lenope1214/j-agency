@@ -1,9 +1,8 @@
 package kr.co.jsol.jagency.file.applicaiton;
 
-import kr.co.jsol.jagency.common.infrastructure.exception.entity.FileException;
-import kr.co.jsol.jagency.file.infrastructure.dto.FileDto;
+import kr.co.jsol.jagency.common.infrastructure.dto.FileDto;
+import kr.co.jsol.jagency.file.domain.enums.EFileStorageType;
 import kr.co.jsol.jagency.file.infrastructure.dto.LocalFileSteamingInfoDto;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,13 +11,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
-public abstract class FileService {
-    protected final String filePathPrefix;
+public abstract class FileServiceBak {
+    private final EFileStorageType fileStorageType;
+    private final String filePathPrefix;
 
-    public FileService(String filePathPrefix) {
+    public FileServiceBak(EFileStorageType fileStorageType, String filePathPrefix) {
+        this.fileStorageType = fileStorageType;
         this.filePathPrefix = filePathPrefix;
     }
 
@@ -34,10 +34,9 @@ public abstract class FileService {
             // 파일 사이즈가 100mb 이상이면 업로드 불가
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일 사이즈가 너무 큽니다. 최대 100MB 까지 업로드 가능합니다.");
         }
-
         String fileExtension = fileOriginalName.substring(fileOriginalName.lastIndexOf(".") + 1);
         String filename = UUID.randomUUID().toString() + "." + fileExtension;
-        String downloadUrl = filePathPrefix + File.separatorChar + filename;
+        String downloadUrl = filePathPrefix + File.pathSeparator + filename;
 
         return new FileDto(
                 fileOriginalName,
@@ -63,21 +62,7 @@ public abstract class FileService {
 
     public abstract long getDirectorySize(String companyId);
 
-    public abstract Integer flushUnusedFiles(List<String> filenames);
+    public abstract void flushUnusedFiles(String companyId, List<String> files);
 
     public abstract LocalFileSteamingInfoDto streaming(String filename, HttpHeaders headers);
-
-    public abstract FileDto unzip(Resource resource, FileDto resourceFIleDto);
-
-    public void isVideoFile(@NotNull MultipartFile file) {
-        if (!Objects.requireNonNull(file.getContentType()).contains("video")) {
-            throw new FileException.NotVideoFormatException();
-        }
-    }
-
-    public void isImageFile(@NotNull MultipartFile file) {
-        if (!Objects.requireNonNull(file.getContentType()).contains("image")) {
-            throw new FileException.NotImageFormatException();
-        }
-    }
 }

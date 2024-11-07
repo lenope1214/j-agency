@@ -1,4 +1,4 @@
-package kr.co.jsol.jagency.common.infrastructure.exception.domain;
+package kr.co.jsol.jagency.common.infrastructure.exception.entity;
 
 import kr.co.jsol.jagency.common.infrastructure.exception.CustomException;
 import org.springframework.http.HttpStatus;

@@ -56,6 +56,11 @@ public class DaedongFileBackupSchedule {
 
     @PostConstruct
     private void init() {
+        if(active == null || !active) {
+            log.info("Daedong File Backup Schedule is No active");
+            return ;
+        }
+
         if (key == null || key.isEmpty()) {
             log.error("file-to-db.key is empty. Exit the program.");
             System.exit(0);

@@ -1,14 +1,21 @@
+# 파일서비스 관련 설정
+file:
+  mode: local # only local
+  dir: C://jsolution/jagency # 파일 저장 경로
+#  target:  실행한 서버 아이피 주소:포트/api/files
+
+
 mifare:
   use: false # true: acr122 사용, false: acr122 사용 안함
 
   secret-key: FFFFFFFFFFFF
   debug: true
 
+# j-agency 최신버전 관리를 위한 정보
 app:
   file-server-host: http://192.168.12.150:18010
   file-path: C://jsolution/jagency # 앱 파일 저장 경로
   version-url: /api/open/extensions/version/jagency # 앱 다운로드 Endpoint
-  download-url: /api/open/extensions/download/jagency # 앱 다운로드 Endpoint
 
   tag:
     mode: write # write = 쓰기 전용, read = 읽기 전용 둘 중에 하나만 작동한다. 기본은 read

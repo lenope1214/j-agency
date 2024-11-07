@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.jsol.jagency.common.infrastructure.dto.FileDto;
 import kr.co.jsol.jagency.common.infrastructure.exception.GeneralClientException;
 import kr.co.jsol.jagency.file.applicaiton.FileService;
+import kr.co.jsol.jagency.file.infrastructure.dto.FileDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -17,16 +18,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@RequiredArgsConstructor
 @Tag(name = "9999. 파일", description = "파일 관리 API")
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
 
     private final FileService fileService;
-
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
-    }
 
     @Operation(summary = "파일'만' 업로드, 주로 업로드 테스트 용도 ")
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
