@@ -1,6 +1,5 @@
-package kr.co.jsol.jagency.application;
+package kr.co.jsol.jagency.common.application;
 
-import kr.co.jsol.jagency.common.application.VersionManagerService;
 import kr.co.jsol.jagency.common.application.cmd.CmdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package kr.co.jsol.jagency.schedules;
+package kr.co.jsol.jagency.daedong.schedules;
 
 import kr.co.jsol.jagency.common.application.StorageService;
 import kr.co.jsol.jagency.filecsv.application.CsvToDBService;
@@ -56,9 +56,9 @@ public class DaedongFileBackupSchedule {
 
     @PostConstruct
     private void init() {
-        if(active == null || !active) {
+        if (active == null || !active) {
             log.info("Daedong File Backup Schedule is No active");
-            return ;
+            return;
         }
 
         if (key == null || key.isEmpty()) {

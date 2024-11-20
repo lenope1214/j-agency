@@ -140,9 +140,9 @@ public class MifareRestServiceImpl extends RestService {
 
     //TODO private로 변경
     public @NotNull Consumer<String> sendServer() {
-        return (arg) -> {
-            log.info("서버로 데이터를 전송합니다 데이터: {}", arg);
-            tag(new TagDto(arg, roomId));
+        return (tagNo) -> {
+            log.info("서버로 데이터를 전송합니다 데이터: {}", tagNo);
+            tag(new TagDto(tagNo, roomId));
         };
     }
 }
