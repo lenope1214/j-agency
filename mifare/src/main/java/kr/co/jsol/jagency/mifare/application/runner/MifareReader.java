@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-
 @Component
 public class MifareReader implements Readable {
 
@@ -24,24 +22,24 @@ public class MifareReader implements Readable {
     @Value("${app.tag.mode:read}")
     private String mode; // read, write
 
-    private HashMap<String, Object> requestBody;
-
     public MifareReader(MifareRestServiceImpl mifareTagService) {
         this.mifareTagService = mifareTagService;
-    }
-
-    public void init(HashMap<String, Object> args) {
-        this.requestBody = args;
     }
 
     @Override
     public void run() {
         log.info("Starting Acr122Reader ");
 
-//        TODO tag test 테스트 후 제거
-//        mifareRepository.sendServer().accept("test");
+        if (isUsed == null) {
+            return;
+        }
 
-        while (isUsed && mode.equals("read")) {
+        if (!isUsed) {
+            log.info("acr122 사용 안함");
+            return;
+        }
+
+        while (mode.equals("read")) {
             try {
                 if (mifareTagService.isConnected()) {
                     log.info("Connected to ACR122");

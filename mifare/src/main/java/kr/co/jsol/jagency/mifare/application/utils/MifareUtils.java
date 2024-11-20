@@ -218,7 +218,6 @@ public final class MifareUtils {
                 byte[] data = hexStringToBytes(dataString);
                 log.info("입력받은 hex값({})을 Bytes로 변경한 결과 : {}", dataString, Arrays.toString(data));
                 MfBlock block = BlockResolver.resolveBlock(MemoryLayout.CLASSIC_1K, sectorId, blockId, data);
-//                log.info("block : " + block);
                 written = writeMifareClassic1KBlock(reader, access, block);
             } catch (MfException me) {
                 log.info("[쓰기 에러 발생]: {}", me.getMessage());

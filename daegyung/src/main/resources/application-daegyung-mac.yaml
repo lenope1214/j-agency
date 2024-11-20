@@ -1,5 +1,10 @@
+file:
+  mode: local # only local
+  dir: C://jsolution/jagency # 파일 저장 경로
+  target: http://localhost:18032
+
 mifare:
-  use: false # true: acr122 사용, false: acr122 사용 안함
+  use: true # true: acr122 사용, false: acr122 사용 안함
 
   secret-key: FFFFFFFFFFFF
   debug: true

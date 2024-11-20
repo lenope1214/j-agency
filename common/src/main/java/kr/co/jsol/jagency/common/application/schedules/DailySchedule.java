@@ -1,6 +1,6 @@
-package kr.co.jsol.jagency.schedules;
+package kr.co.jsol.jagency.common.application.schedules;
 
-import kr.co.jsol.jagency.application.VersionChecker;
+import kr.co.jsol.jagency.common.application.VersionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;

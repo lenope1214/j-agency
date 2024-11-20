@@ -14,5 +14,4 @@ bootJar.archiveFileName.set("jagency.jar")
 dependencies {
     implementation(project(":common"))
     implementation(project(":mifare"))
-    implementation(project(":file-csv"))
 }

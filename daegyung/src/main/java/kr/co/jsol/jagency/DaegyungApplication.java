@@ -16,12 +16,12 @@ import java.util.TimeZone;
         // datasource 설정이 없는 경우 해당 설정을 사용하면 정상 기동됨
         exclude = {DataSourceAutoConfiguration.class}
 )
-public class ApiApplication {
+public class DaegyungApplication {
 
     public static void main(String[] args) {
         // timezone 설정 1
         System.setProperty("user.timezone", "Asia/Seoul");
-        SpringApplication.run(ApiApplication.class, args);
+        SpringApplication.run(DaegyungApplication.class, args);
     }
 
     // timezone 설정 2

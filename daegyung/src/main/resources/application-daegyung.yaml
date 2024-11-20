@@ -6,7 +6,7 @@ file:
 
 
 mifare:
-  use: false # true: acr122 사용, false: acr122 사용 안함
+  use: true # true: acr122 사용, false: acr122 사용 안함
 
   secret-key: FFFFFFFFFFFF
   debug: true
